@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { alovaInstance } from '../api'
+// import { alovaInstance } from '../api'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -10,13 +10,13 @@ export const useUserStore = defineStore('user', {
   actions: {
     async login(username: string, password: string) {
       try {
-        const response = await alovaInstance.Post('/auth/login', {
-          username,
-          password
-        }).send()
-        this.token = response.token
-        this.user = response.user
-        localStorage.setItem('token', this.token)
+        // const response = await alovaInstance.Post('/auth/login', {
+        //   username,
+        //   password
+        // }).send()
+        // this.token = response.token
+        // this.user = response.user
+        // localStorage.setItem('token', this.token)
         return true
       } catch (error) {
         console.error('Login failed:', error)
@@ -26,8 +26,8 @@ export const useUserStore = defineStore('user', {
 
     async register(userData: any) {
       try {
-        const response = await alovaInstance.Post('/auth/register', userData).send()
-        return response
+        // const response = await alovaInstance.Post('/auth/register', userData).send()
+        // return response
       } catch (error) {
         console.error('Registration failed:', error)
         throw error
