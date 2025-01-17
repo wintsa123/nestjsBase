@@ -1,0 +1,43 @@
+PORT: 9089
+PREFIX: api
+
+getToken: http://127.0.0.1:8088/ssologin/getToken
+checkToken: http://127.0.0.1:8088/ssologin/checkToken
+oaAppid: 3d077166-676e-4ec8-a9c0-706c6a89c36b
+# 数据库配置
+datasource:
+  driverName: mysql
+  host: www.db4free.net
+  port: 3306
+  database: dev_wintsa
+  username: wintsa
+  password: 12300114
+  charset: utf8
+  loc: Asia/Shanghai
+  logging: true
+
+
+
+
+# 腾讯地图api
+TxKey: LX7BZ-UQZ6Q-ANJ5N-4I4XJ-G6DZ6-7AFVI
+TXSecretKey: jd3SQgZZvl2Xenpa1V7pe8dXrLnRiKLg
+# 阿里oss存储(可直接使用)
+aliyunOss:
+  accessKeyId: 'LTAI4FmwbKtoErzJdwfJmcmd'
+  accessKeySecret: 'bu5UZXAG2dXQ6G75bzTDXoTN1VcALv'
+  endpointUrl: 'oss-cn-shenzhen'
+  bucketUrl: 'https://an-jia-shop.oss-cn-shenzhen.aliyuncs.com'
+  bucketName: 'an-jia-shop'
+  imgDefaultSize: 5
+  supportImgTypes: ['.png', '.jpg', '.gif', '.jpeg']
+
+
+zhiyin:
+  url: https://www.zhiyinseal.com/smartsealservice/
+  appId: 9koctjctghthidy60frqc4uab2hjevk1
+  appKey: inxz77e5woa4ql6n3o4ciaohbxm0flb8
+  AgentId: 1000023
+
+
+ipWhitelist: ['127.0.0.1','192.168.2.1','192.168.2.221']

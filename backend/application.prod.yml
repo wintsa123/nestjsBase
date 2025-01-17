@@ -1,0 +1,39 @@
+PORT: 9089
+PREFIX: api
+
+getToken: http://127.0.0.1:8088/ssologin/getToken
+checkToken: http://127.0.0.1:8088/ssologin/checkToken
+oaAppid: 3d077166-676e-4ec8-a9c0-706c6a89c36b
+# 数据库配置
+datasource:
+  driverName: mysql
+  host: www.db4free.net
+  port: 3306
+  database: dev_wintsa
+  username: wintsa
+  password: ${DB_PASSWORD}
+  charset: utf8
+  loc: Asia/Shanghai
+  logging: true
+
+
+
+
+
+# 腾讯地图api
+TxKey: ${TX_KEY}
+TXSecretKey: ${TX_SECRET_KEY}
+
+# 阿里oss存储
+aliyunOss:
+  accessKeyId: ${OSS_ACCESS_KEY_ID}
+  accessKeySecret: ${OSS_ACCESS_KEY_SECRET}
+  endpointUrl: ${OSS_ENDPOINT}
+  bucketUrl: ${OSS_BUCKET_URL}
+  bucketName: ${OSS_BUCKET_NAME}
+  imgDefaultSize: 5
+  supportImgTypes: ['.png', '.jpg', '.gif', '.jpeg']
+
+
+
+ipWhitelist: ['127.0.0.1','192.168.2.1','192.168.2.221']
