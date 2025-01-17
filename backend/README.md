@@ -20,7 +20,7 @@
 
 - 4、安装依赖包
    ```js
-    yarn install
+    npmp install
    ```
    
    window环境 务必将项目下的oracle的bin添加进环境变量
@@ -49,11 +49,11 @@
 - [x] `ecosystem.config.js`是采用`PM2`的配置文件,项目开发完后直接运行命令一键部署
 
   ```shell
-  npm run build
+  npmp run build
   # 开发环境
-  npm run pm2:dev
+  npmp run pm2:dev
   # 生产环境
-  npm run pm2:prod
+  npmp run pm2:prod
   ```
 
 - [x] `winston`日志系统根据小时来划分日志管理,如果要实时查看日志，直接使用`PM2`查看日志
