@@ -16,30 +16,9 @@ datasource:
   loc: Asia/Shanghai
   logging: true
 
-datasourceOracle:
-  driverName: oracle
-  host: 192.168.2.222
-  port: 1521
-  database: ecology
-  username: ecology
-  password: newzwgccom18975
-  sid: ecology
-  charset: utf8
-  loc: Asia/Shanghai
-  logging: true
 
 
-#企业微信配置
-wxChat:
-  corpsecret: ${WX_CORP_SECRET}
-  CorpID: ${WX_CORP_ID}
-  AgentId: ${WX_AGENT_ID}
-  Token: ${WX_TOKEN}
-  Key: ${WX_KEY}
-  dakaSecret: ${WX_DAKA_SECRET}
-  tongXunSecret: ${WX_TONGXUN_SECRET}
-  OaSecret: ${WX_OA_SECRET}
-  OA2Secret: ${WX_OA2_SECRET}
+
 
 # 腾讯地图api
 TxKey: ${TX_KEY}
@@ -55,19 +34,6 @@ aliyunOss:
   imgDefaultSize: 5
   supportImgTypes: ['.png', '.jpg', '.gif', '.jpeg']
 
-# 法大大
-fadada:
-  appId: ${FADADA_APP_ID}
-  appSecret: ${FADADA_APP_SECRET}
-  serverUrl: ${FADADA_SERVER_URL}
-  opencorpId: ${FADADA_OPENCORP_ID}
-  businessId: ${FADADA_BUSINESS_ID}
 
-# 豸印
-zhiyin:
-  url: ${ZHIYIN_URL}
-  appId: ${ZHIYIN_APP_ID}
-  appKey: ${ZHIYIN_APP_KEY}
-  AgentId: ${ZHIYIN_AGENT_ID}
 
 ipWhitelist: ['127.0.0.1','192.168.2.1','192.168.2.221']

@@ -4,7 +4,6 @@ import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipAuth } from '@src/decorators/skip-auth';
 import { FileUploadDto } from '../file.dto';
 import { base64 } from './dto/base64.dto';
-import { FileInterceptor, UploadedFile, StorageFile } from '@blazity/nest-file-fastify';
 
 import { keyword } from './dto/keyword.dto';
 import { CreateFileManageDto } from './dto/file.dto';

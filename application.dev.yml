@@ -17,17 +17,7 @@ datasource:
   logging: true
 
 
-#企业微信配置
-wxChat:
-  corpsecret: YbF5JHEjAKWuO5-5nLf5xuH2R1wFc8pGBWTq0fyE12s
-  CorpID: ww97588d93c357248d
-  AgentId: 1000004
-  Token: KxvcyR3SQqTIzAVyIQTn2
-  Key: Fc3rx5pyQ4BePDDT7t5jHOvTzfdVbBDgySDhbebWDAq
-  dakaSecret: 06J216adGcxmj2YaDiUI7F2bwGWBiaS6XcMuYwVbMZI
-  tongXunSecret: -dAuFs4uhcyOjpkHgxDrvPV8gdNb7OPvJW3odGeCua4
-  OaSecret: tdSkeup7gRnpDa9EfLG0scV0cElrX9pqkvJJVHVw7bI
-  OA2Secret: YbF5JHEjAKWuO5-5nLf5xuH2R1wFc8pGBWTq0fyE12s
+
 
 # 腾讯地图api
 TxKey: LX7BZ-UQZ6Q-ANJ5N-4I4XJ-G6DZ6-7AFVI
@@ -41,20 +31,7 @@ aliyunOss:
   bucketName: 'an-jia-shop'
   imgDefaultSize: 5
   supportImgTypes: ['.png', '.jpg', '.gif', '.jpeg']
-#法大大
-fadada:
-  appId: '00000876'
-  appSecret: S1NAPOWD45VIXDMI9NL0S3NKSDVM6H3G 
-  serverUrl: https://api.fadada.com/api/v5/
-  opencorpId: 15ad1a994ed746dbbc2420840308d7a6
-  businessId: d065d6947bfb545df69faaaff10868a5
-# fadada:
-#   appId: '80000470'
-#   appSecret: FQCLPQRNNIZXVLX1NQDBS10DUZJ8HNFQ
-#   serverUrl: https://uat-api.fadada.com/api/v5
-#   opencorpId: b665596642694fa39a11e22ca5cdc704
-#   businessId: 3b68a1ff1e851c69ba4c70c2b1997421
-#豸印
+
 
 zhiyin:
   url: https://www.zhiyinseal.com/smartsealservice/

@@ -1,18 +1,6 @@
 import { Injectable, Logger, Body } from '@nestjs/common';
 import { RedisService } from '@src/plugin/redis/redis.service';
-import axios from 'axios';
-import { promisify } from 'node:util';
-import { pipeline } from 'node:stream';
-import { getRandomNum, getUrlQuery } from '@src/utils';
-import { trim, compact, concat, uniqBy, groupBy, differenceBy, chunk, forEach, flatMap, uniq, map } from 'lodash';
-import moment from 'moment';
-import { Tendering } from '@src/corn/entities/Tendering.entity';
-import { In, MoreThan, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import path from 'path';
-import { spiderdata } from './entities/spiderData.entity';
 import 'moment/locale/zh-cn'; // 如果需要中文支持，请导入中文语言环境
-import iconv from 'iconv-lite';
 import https from 'https';
 import { XMLParser, XMLBuilder, XMLValidator } from "fast-xml-parser"
 import QRCode from 'qrcode'
