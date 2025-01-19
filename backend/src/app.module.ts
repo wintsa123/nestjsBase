@@ -1,4 +1,4 @@
-import { ClassSerializerInterceptor, Logger, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,12 +11,11 @@ import {
   ApiInterceptor,
 } from './interceptors';
 import { ValidationPipe } from './pipe/validation.pipe';
-import { IS_DEV, getConfig } from './utils';
+import { getConfig } from './utils';
 import { ApiModule } from './api/api.module';
 import { PluginModule } from './plugin/plugin.module';
 import { SocketModule } from './socket/socket.module';
 import { CronModule } from './corn/rebot.module';
-import { AuthGuard } from './guard/auth.guard';
 
 @Module({
   imports: [
@@ -89,11 +88,8 @@ import { AuthGuard } from './guard/auth.guard';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
+    }
+   
   ],
 })
 export class AppModule {

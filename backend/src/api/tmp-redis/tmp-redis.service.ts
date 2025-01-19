@@ -1,9 +1,7 @@
-import { Injectable, Logger, Body } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { RedisService } from '@src/plugin/redis/redis.service';
 import 'moment/locale/zh-cn'; // 如果需要中文支持，请导入中文语言环境
-import https from 'https';
-import { XMLParser, XMLBuilder, XMLValidator } from "fast-xml-parser"
-import QRCode from 'qrcode'
+import QRCode from 'qrcode';
 
 
 

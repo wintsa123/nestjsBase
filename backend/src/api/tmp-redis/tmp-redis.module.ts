@@ -1,14 +1,8 @@
-import { Global, Module } from '@nestjs/common';
+import {  Module } from '@nestjs/common';
 import { TmpRedisService } from './tmp-redis.service';
 import { TmpRedisController } from './tmp-redis.controller';
 import { RouterModule } from '@nestjs/core';
-import { Tendering } from '@src/corn/entities/Tendering.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { hotKeyword } from '@src/corn/entities/keyword.entity';
-import { oldhistroy } from '@src/corn/entities/oldHistroy.entity';
-import { wxrobot } from '@src/corn/entities/robot.entity';
-import { Zbkey } from './../../corn/entities/zbKey.entity';
-import { spiderdata } from './entities/spiderData.entity';
 
 @Module({
   imports: [
@@ -19,7 +13,7 @@ import { spiderdata } from './entities/spiderData.entity';
         module: TmpRedisModule,
       },
     ]),
-    TypeOrmModule.forFeature([Tendering, hotKeyword, oldhistroy, wxrobot, Zbkey, spiderdata]),
+    TypeOrmModule.forFeature([]),
 
   ],
   controllers: [TmpRedisController],

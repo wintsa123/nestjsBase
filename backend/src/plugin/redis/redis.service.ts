@@ -17,10 +17,10 @@ export class RedisService {
 
   private getClient() {
     this.redisClient = new Redis({
-      port: 6388, // Redis port
-      host: '192.168.2.221', // redisDb Redis host
+      port: 6379, // Redis port
+      host: 'vocal-hyena-57342.upstash.io', // redisDb Redis host
       username: '', // needs Redis >= 6
-      password: '12300114', // 密码
+      password: 'Ad_-AAIjcDE1YjZiM2QyNTY2ODQ0NmI0YTFmMTFiZDE1M2Y3M2MwOHAxMA', // 密码
       db: 0, // redis是几个数据库的，使用第一个
     });
   }
