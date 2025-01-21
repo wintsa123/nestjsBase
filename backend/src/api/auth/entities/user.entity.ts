@@ -4,7 +4,8 @@ import { baseEntity } from '@src/api/base.entity';
 
 @Entity('users')
 export class UserEntity extends baseEntity{
-  @Column({ unique: true, type: 'bigint' })
+  @Column({ unique: true, type: 'bigint',nullable: true,default:null
+  })
   phone?: number|null;
 
   @Column({default:null, comment: '真实姓名'
@@ -17,7 +18,7 @@ export class UserEntity extends baseEntity{
 
   @Column({
     type: 'varchar',
-    length: 255, // 可选，设置适当长度
+    length: 350, // 可选，设置适当长度
     unique: true,
     nullable: true
   })
@@ -35,10 +36,11 @@ export class UserEntity extends baseEntity{
     super();
 
     for (const key in partial) {
-      if (partial[key] === '') {
-        partial[key] = null; // 将空字符串替换为 null
+      if (partial[key] === '' || partial[key] === undefined || partial[key] === null ) {
+       delete partial[key] ; // 将空字符串替换为 null
       }
     }
+    console.log('constructor',partial)
     Object.assign(this, partial);
   }
 
