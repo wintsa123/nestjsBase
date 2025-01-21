@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import Redis, { ClientContext, Result } from 'ioredis';
+import { ClientContext, Result } from 'ioredis';
+import { Redis } from '@upstash/redis'
 
 import { ObjectType } from '@src/types';
 import { isObject } from '@src/utils';
@@ -14,17 +15,31 @@ export class RedisService {
       this.getClient();
     }
   }
-
   private getClient() {
     this.redisClient = new Redis({
-      port: 6379, // Redis port
-      host: 'vocal-hyena-57342.upstash.io', // redisDb Redis host
-      username: '', // needs Redis >= 6
-      password: 'Ad_-AAIjcDE1YjZiM2QyNTY2ODQ0NmI0YTFmMTFiZDE1M2Y3M2MwOHAxMA', // 密码
-      db: 0, // redis是几个数据库的，使用第一个
-    });
+      url: 'https://vocal-hyena-57342.upstash.io',
+      token: 'Ad_-AAIjcDE1YjZiM2QyNTY2ODQ0NmI0YTFmMTFiZDE1M2Y3M2MwOHAxMA',
+    })
   }
+  // private getClient() {
+  //   this.redisClient = new Redis({
+  //     port: 6379, // Redis port
+  //     host: 'vocal-hyena-57342.upstash.io', // redisDb Redis host
+  //     username: '', // needs Redis >= 6
+  //     password: 'Ad_-AAIjcDE1YjZiM2QyNTY2ODQ0NmI0YTFmMTFiZDE1M2Y3M2MwOHAxMA', // 密码
+  //     db: 0, // redis是几个数据库的，使用第一个
 
+  //   });
+  // }
+  // private getClient() {
+  //   this.redisClient = new Redis({
+  //     port: 6388, // Redis port
+  //     host: '192.168.2.221', // redisDb Redis host
+  //     username: '', // needs Redis >= 6
+  //     password: '12300114', // 密码
+  //     db: 0, // redis是几个数据库的，使用第一个
+  //   });
+  // }
   /**
    * @Author: 水痕
    * @Date: 2022-08-11 11:25:54
@@ -46,7 +61,9 @@ export class RedisService {
     if (!second) {
       return await this.redisClient.set(key, value);
     } else {
-      return await this.redisClient.set(key, value, 'EX', second);
+      // return await this.redisClient.set(key, value, 'EX', second);
+      return await this.redisClient.set(key, value, { ex: second });
+
     }
   }
 
@@ -71,9 +88,9 @@ export class RedisService {
    */
   public async get(key: string): Promise<Result<string | null, ClientContext>> {
     try {
-      const data = await this.redisClient.get(key);
+      const data:any = await this.redisClient.get(key);
       if (data) {
-        return JSON.parse(data);
+        return isObject(data) ? data : JSON.parse(data);
       } else {
         return null;
       }
@@ -126,7 +143,7 @@ export class RedisService {
    * @param {string} key
    * @return {*}
    */
-  async hgetall(key: string): Promise<Result<Record<string, string>, ClientContext>> {
+  async hgetall(key: string){
     return await this.redisClient.hgetall(key);
   }
 
@@ -140,29 +157,29 @@ export class RedisService {
   public async flushall(): Promise<Result<'OK', ClientContext>> {
     return await this.redisClient.flushall();
   }
-/**
- * @Author: wintsa
- * @Date: 2024-11-28 
- * @LastEditors: wintsa
- * @Description: redis like
- * @returns {*} 
- */
-  public async like(keyPattern: string): Promise<string[]> {
-    try {
-      const stream = this.redisClient.scanStream({
-        match: keyPattern, // 使用通配符匹配
-      });
-  
-      const keys: string[] = [];
-      for await (const keyBatch of stream) {
-        keys.push(...keyBatch);
-      }
-  
-      const values = await Promise.all(keys.map((key) => this.redisClient.get(key)));
-      return values.filter((value) => value !== null);
-    } catch (error) {
-      console.error('Error during LIKE query:', error);
-      throw error;
-    }
-  }
+  /**
+   * @Author: wintsa
+   * @Date: 2024-11-28 
+   * @LastEditors: wintsa
+   * @Description: redis like
+   * @returns {*} 
+   */
+  // public async like(keyPattern: string): Promise<string[]> {
+  //   try {
+  //     const stream = this.redisClient.scanStream({
+  //       match: keyPattern, // 使用通配符匹配
+  //     });
+
+  //     const keys: string[] = [];
+  //     for await (const keyBatch of stream) {
+  //       keys.push(...keyBatch);
+  //     }
+
+  //     const values = await Promise.all(keys.map((key) => this.redisClient.get(key)));
+  //     return values.filter((value) => value !== null);
+  //   } catch (error) {
+  //     console.error('Error during LIKE query:', error);
+  //     throw error;
+  //   }
+  // }
 }

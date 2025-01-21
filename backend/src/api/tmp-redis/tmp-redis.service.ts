@@ -23,7 +23,7 @@ export class TmpRedisService {
      */
     async cleanAll() {
 
-        this.redisService.flushall()
+        return await this.redisService.flushall()
     }
    
     /**
@@ -55,7 +55,7 @@ export class TmpRedisService {
      * @Description: redis like
      * @returns {*} 
      */
-    async redisLike(key) {
-        return await this.redisService.like(key)
-    }
+    // async redisLike(key) {
+    //     return await this.redisService.like(key)
+    // }
 }

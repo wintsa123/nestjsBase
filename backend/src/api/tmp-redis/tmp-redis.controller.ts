@@ -33,11 +33,11 @@ export class TmpRedisController {
     const result = await this.tmpRedisService.qrcode(data);
     return result;
   }
-  @ApiOperation({ summary: 'redisLike' })
-  @Post('/redisLike')
-  async redisLike(@Body() data:url) {
-    const result = await this.tmpRedisService.redisLike(data.key)
-    return result;
-  }
+  // @ApiOperation({ summary: 'redisLike' })
+  // @Post('/redisLike')
+  // async redisLike(@Body() data:url) {
+  //   const result = await this.tmpRedisService.redisLike(data.key)
+  //   return result;
+  // }
   
 }
