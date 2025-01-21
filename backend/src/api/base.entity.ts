@@ -1,4 +1,4 @@
-import { Transform, TransformFnParams } from 'class-transformer';
+import { Exclude, Transform, TransformFnParams } from 'class-transformer';
 import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
@@ -32,6 +32,7 @@ export class baseEntity extends BaseEntity {
     comment: '更新时间',
   })
   updatedAt!: Date;
+
 
   @DeleteDateColumn({
     type: 'timestamp',

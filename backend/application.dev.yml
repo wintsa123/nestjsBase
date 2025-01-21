@@ -1,9 +1,7 @@
 PORT: 9089
 PREFIX: api
 
-getToken: http://127.0.0.1:8088/ssologin/getToken
-checkToken: http://127.0.0.1:8088/ssologin/checkToken
-oaAppid: 3d077166-676e-4ec8-a9c0-706c6a89c36b
+
 # 数据库配置
 datasource:
   driverName: mysql

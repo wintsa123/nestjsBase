@@ -1,10 +1,10 @@
 # 配置数据库连接信息
 data_source:
   driverName: mysql
-  host: 192.168.2.222
+  host: www.db4free.net
   port: 3306
-  database: nestapi
-  username: root
+  database: dev_wintsa
+  username: wintsa
   password: 12300114
   charset: utf8
   loc: Asia/Shanghai

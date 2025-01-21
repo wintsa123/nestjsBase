@@ -8,13 +8,10 @@ import { Connection, MoreThan, Repository, createConnection } from 'typeorm';
 import moment from 'moment';
 import { IS_DEV } from '@src/utils';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Tendering } from './entities/Tendering.entity';
+
 import { chunk, differenceBy, flatMap } from 'lodash';
 import { TmpRedisService } from '@src/api/tmp-redis/tmp-redis.service';
-import { wxrobot } from './entities/robot.entity';
-import { Zbkey } from './entities/zbKey.entity';
 import { RedisService } from '@src/plugin/redis/redis.service';
-import { spiderdata } from '@src/api/tmp-redis/entities/spiderData.entity';
 
 
 @Injectable()

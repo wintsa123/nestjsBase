@@ -31,4 +31,25 @@
 电子族谱/
 ├── frontend/          # Vue 3 前端项目
 └── backend/           # NestJS 后端项目
+      └── src/          # 项目源码目录
+         └── api/        # API 目录
+            └── api.module.ts  # API 模块入口
+            └── user   # 用户管理模块
+              └── user.module.ts  # 用户管理模块
+              └── user.controller.ts # 用户控制器
+              └── user.service.ts # 用户服务
+            └── tmp-redis# redis模块
+              └── tmp-redis.controller.ts # redis控制器
+              └── tmp-redis.service.ts # redis服务
+              └── tmp-redis.module.ts # redis模块
+            └── auth # auth验证模块
+              └── auth.module.ts # auth验证模块
+         └── main.ts    # NestJS 应用入口
+         └── app.module.ts # 应用模块
+         └── socket # socket模块
+         └── plugin # 插件模块
+         └── interceptors # 拦截器模块
+         └── filters # 过滤器模块
+         └── guard # 守卫模块
+         └── decorators # 装饰器模块
 ```

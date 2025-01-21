@@ -1,12 +1,7 @@
 import { Body, Controller, Get, Post, Put, Query, Req, Res, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
 import { TmpRedisService } from './tmp-redis.service';
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipAuth } from '@src/decorators/skip-auth';
-import { FileUploadDto } from '../file.dto';
-import { base64 } from './dto/base64.dto';
-
-import { keyword } from './dto/keyword.dto';
-import { CreateFileManageDto } from './dto/file.dto';
 import { url } from './dto/url.dto';
 import { RedisCacheApi } from '@src/decorators';
 @ApiTags('utils')

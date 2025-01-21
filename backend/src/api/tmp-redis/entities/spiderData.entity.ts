@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, Up
 import { Transform, TransformFnParams } from 'class-transformer';
 import { baseEntity } from '@src/api/base.entity';
 
-@Entity({ name: 'spiderdata', database: 'nestapi' })
+// @Entity({ name: 'spiderdata', database: 'nestapi' })
 export class spiderdata {
     @PrimaryColumn({
         type: 'varchar',
