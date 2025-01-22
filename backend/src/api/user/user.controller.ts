@@ -1,5 +1,5 @@
 import { UseInterceptors,Controller, Post, Body, UseGuards, Request, ClassSerializerInterceptor } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from './user.service';
 import { user } from './dto/user.dto';
 import { ApiTags } from '@nestjs/swagger';
 

@@ -13,8 +13,8 @@ export class AuthService {
     private jwtService: JwtService,
   ) { }
 
-  async validateUser(phone: number, password: string): Promise<any> {
-    const user = await this.usersRepository.findOne({ where: { phone } });
+  async validateUser(phone: number, password: string,email: string): Promise<any> {
+    const user = await this.usersRepository.findOne({ where: [{ phone: phone }, { email: email }] });
     if (user && await bcrypt.compare(password, user.password)) {
       const { password, ...result } = user;
       return result;
@@ -23,14 +23,32 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { phone: user.phone, sub: user.id };
+    const userData = await this.usersRepository.findOne({
+      where: [{ phone: user.phone }, { email: user.email }],
+    });
+    if (!userData) {
+      throw new UnauthorizedException('用户不存在');
+    }
+    // 生成 refresh_token
+    const payload = {
+      sub: userData.id, key: userData.phone ? `phone:${userData.phone}` : `email:${userData.email}`
+    };
+
+    const refresh_token = this.jwtService.sign(payload, {
+      expiresIn: '7d', // refresh_token 有效期为 7 天
+    });
+
+    // 计算 token 的生效时间和过期时间
+    const now = Math.floor(Date.now() / 1000); // 当前时间（秒）
+    const accessTokenExpiresIn = 3600; // access_token 有效期为 1 小时（秒）
+    const accessTokenExpiresAt = now + accessTokenExpiresIn; // 过期时间
+
+    // 返回结果
+    // const { password, ...result } = savedUser; // 排除密码字段
     return {
-      access_token: this.jwtService.sign(payload),
-      user: {
-        id: user.id,
-        phone: user.phone,
-        email: user.email,
-      },
+      token: this.jwtService.sign(payload),
+      refresh_token,
+      tokenExpireTime: accessTokenExpiresAt
     };
   }
 
@@ -68,13 +86,14 @@ export class AuthService {
     const savedUser = await this.usersRepository.save(user);
 
     // 生成 access_token
-    const accessTokenPayload = { sub: savedUser.id,   key: savedUser.phone ? `phone:${savedUser.phone}` : `email:${savedUser.email}`
-  };
-    const accessToken = this.jwtService.sign(accessTokenPayload);
+    const TokenPayload = {
+      sub: savedUser.id, key: savedUser.phone ? `phone:${savedUser.phone}` : `email:${savedUser.email}`
+    };
+    const accessToken = this.jwtService.sign(TokenPayload);
 
     // 生成 refresh_token
-    const refreshTokenPayload = { sub: savedUser.id };
-    const refreshToken = this.jwtService.sign(refreshTokenPayload, {
+
+    const refreshToken = this.jwtService.sign(TokenPayload, {
       expiresIn: '7d', // refresh_token 有效期为 7 天
     });
 
@@ -84,15 +103,11 @@ export class AuthService {
     const accessTokenExpiresAt = now + accessTokenExpiresIn; // 过期时间
 
     // 返回结果
-    const { password, ...result } = savedUser; // 排除密码字段
+    // const { password, ...result } = savedUser; // 排除密码字段
     return {
-      accessToken,
-      refreshToken,
-      tokenInfo: {
-        issuedAt: now, // token 生效时间
-        expiresAt: accessTokenExpiresAt, // token 过期时间
-        expiresIn: accessTokenExpiresIn, // token 有效期（秒）
-      },
+      token: accessToken,
+      refresh_token: refreshToken,
+      tokenExpireTime: accessTokenExpiresAt
     };
   }
 }

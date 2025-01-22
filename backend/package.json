@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "copy-static-files": "node copy-static-files.js",
-    "build": "nest build && yarn run copy-static-files",
+    "build": "nest build && node copy-static-files",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "cross-env RUNNING_ENV=dev nest start",
     "dev": "cross-env RUNNING_ENV=dev nest start --watch ",
@@ -19,10 +19,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "pm2:prod": "yarn run build && cross-env RUNNING_ENV=prod pm2 start ecosystem.config.js --env production",
-    "pm2:dev": "yarn run build && pm2 start ecosystem.config.js --env development",
-    "pm2:test": "yarn run build && pm2 start ecosystem.config.js --env test",
-    "update": "git pull  &&yarn build &&pm2 restart zw-nestjs &&pm2 log",
+    "pm2:prod": "nest build &&  copy-static-files && cross-env RUNNING_ENV=prod pm2 start ecosystem.config.js --env production",
+    "pm2:dev": "nest build && node copy-static-files && pm2 start ecosystem.config.js --env development",
+    "pm2:test": "nest build && node copy-static-files && pm2 start ecosystem.config.js --env test",
+    "update": "git pull  && nest build && node copy-static-files && &&pm2 restart zw-nestjs &&pm2 log",
     "gitpush": "git add . && git commit -m \"backup  %DATE% %TIME%\" && git push"
   },
   "dependencies": {

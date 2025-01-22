@@ -42,7 +42,7 @@ import { CronModule } from './corn/rebot.module';
             logging: configService.get('datasource.logging'),
             timezone: '+08:00', // 东八区
             autoLoadEntities: true,
-            synchronize:  true, // 自动同步表结构
+            synchronize:  false, // 自动同步表结构
             cache: {
               duration: 60000, // 1分钟的缓存
             },

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { TmpRedisModule } from './tmp-redis/tmp-redis.module';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './user/user.module';
 
 
 @Module({

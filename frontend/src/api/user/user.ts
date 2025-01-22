@@ -15,8 +15,8 @@ export const login = () => {
     };
     return method;
 };
-export const signin = () => {
-    const method = alovaInstance.Get('/signin');
+export const register = () => {
+    const method = alovaInstance.Get('/register');
     method.meta = {
         authRole: 'login'
     };

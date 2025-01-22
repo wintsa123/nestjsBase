@@ -3,8 +3,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
+import { AuthService } from './user.service';
+import { AuthController } from './user.controller';
 // import { JwtStrategy } from './jwt.strategy';
 // import { LocalStrategy } from './local.strategy';
 
@@ -13,7 +13,7 @@ import { AuthController } from './auth.controller';
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'wintsa',
-      signOptions: { expiresIn: '3d' },
+      signOptions: { expiresIn: '1h' },
     }),
     TypeOrmModule.forFeature([UserEntity]),
   ],
