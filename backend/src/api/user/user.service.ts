@@ -4,54 +4,53 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { user } from './dto/user.dto';
 
 @Injectable()
-export class AuthService {
+export class userService {
   constructor(
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
     private jwtService: JwtService,
   ) { }
 
-  async validateUser(phone: number, password: string,email: string): Promise<any> {
-    const user = await this.usersRepository.findOne({ where: [{ phone: phone }, { email: email }] });
-    if (user && await bcrypt.compare(password, user.password)) {
-      const { password, ...result } = user;
-      return result;
+
+
+  async findOne(userData: { phone?: number | null; email?: string | null }) {
+    const whereConditions:any = [];
+    
+    // 检查并添加有效的phone条件
+    if (userData.phone != null) {
+      whereConditions.push({ phone: userData.phone });
     }
-    return null;
+    
+    // 检查并添加有效的email条件
+    if (userData.email != null) {
+      whereConditions.push({ email: userData.email });
+    }
+    
+    // 确保至少有一个条件
+    if (whereConditions.length === 0) {
+      throw '必须提供 phone 或 email 其中一项'
+    }
+    
+    // 执行查询（OR 条件）
+    return await this.usersRepository.findOne({
+      where: whereConditions
+    });
   }
+
+
 
   async login(user: any) {
-    const userData = await this.usersRepository.findOne({
-      where: [{ phone: user.phone }, { email: user.email }],
-    });
-    if (!userData) {
-      throw new UnauthorizedException('用户不存在');
-    }
-    // 生成 refresh_token
-    const payload = {
-      sub: userData.id, key: userData.phone ? `phone:${userData.phone}` : `email:${userData.email}`
+    console.log(user)
+    const TokenPayload = {
+      sub: user.id, key: user.phone ? `phone:${user.phone}` : `email:${user.email}`
     };
-
-    const refresh_token = this.jwtService.sign(payload, {
-      expiresIn: '7d', // refresh_token 有效期为 7 天
-    });
-
-    // 计算 token 的生效时间和过期时间
-    const now = Math.floor(Date.now() / 1000); // 当前时间（秒）
-    const accessTokenExpiresIn = 3600; // access_token 有效期为 1 小时（秒）
-    const accessTokenExpiresAt = now + accessTokenExpiresIn; // 过期时间
-
-    // 返回结果
-    // const { password, ...result } = savedUser; // 排除密码字段
     return {
-      token: this.jwtService.sign(payload),
-      refresh_token,
-      tokenExpireTime: accessTokenExpiresAt
+      access_token: this.jwtService.sign(TokenPayload),
     };
   }
-
   async register(userData: { phone: number; password: string; email: string }) {
     // 检查手机号是否已注册
     if (userData.phone) {

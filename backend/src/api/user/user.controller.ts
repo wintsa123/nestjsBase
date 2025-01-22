@@ -1,25 +1,33 @@
-import { UseInterceptors,Controller, Post, Body, UseGuards, Request, ClassSerializerInterceptor } from '@nestjs/common';
-import { AuthService } from './user.service';
+import { UseInterceptors,Controller, Post, Body, UseGuards, Request, ClassSerializerInterceptor, Req } from '@nestjs/common';
+import { userService } from './user.service';
 import { user } from './dto/user.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 // import { LocalAuthGuard } from './local-auth.guard';
 @ApiTags('user')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: userService) {}
 
-  // @UseGuards(LocalAuthGuard)
+  @UseGuards(AuthGuard('local'))
   @Post('login')
-  async login(@Body() registerData: user) {
-    return this.authService.login(registerData);
+  async login(@Req() req: Request|any) {
+    return this.authService.login(req.user);
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Post('register')
   async register(
     @Body() registerData: user
   ) {
     return this.authService.register(registerData);
+  }
+
+
+  @Post('test')
+  async test(
+    @Body() registerData: user
+  ) {
+    return this.authService.findOne(registerData);
   }
 }

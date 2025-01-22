@@ -14,6 +14,7 @@ export class baseEntity extends BaseEntity {
     comment: '主键id',
   })
   id!: number;
+  @Exclude()
 
   @Transform((row: TransformFnParams) => +new Date(row.value))
   @CreateDateColumn({
@@ -23,6 +24,7 @@ export class baseEntity extends BaseEntity {
     comment: '创建时间',
   })
   createdAt!: Date;
+  @Exclude()
 
   @Transform((row: TransformFnParams) => +new Date(row.value))
   @UpdateDateColumn({
@@ -33,6 +35,7 @@ export class baseEntity extends BaseEntity {
   })
   updatedAt!: Date;
 
+  @Exclude()
 
   @DeleteDateColumn({
     type: 'timestamp',
