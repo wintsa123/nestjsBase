@@ -17,23 +17,23 @@ export class userService {
 
 
   async findOne(userData: { phone?: number | null; email?: string | null }) {
-    const whereConditions:any = [];
-    
+    const whereConditions: any = [];
+
     // 检查并添加有效的phone条件
     if (userData.phone != null) {
       whereConditions.push({ phone: userData.phone });
     }
-    
+
     // 检查并添加有效的email条件
     if (userData.email != null) {
       whereConditions.push({ email: userData.email });
     }
-    
+
     // 确保至少有一个条件
     if (whereConditions.length === 0) {
       throw '必须提供 phone 或 email 其中一项'
     }
-    
+
     // 执行查询（OR 条件）
     return await this.usersRepository.findOne({
       where: whereConditions
@@ -50,7 +50,7 @@ export class userService {
     if (user && await bcrypt.compare(password, user.password)) {
       const { password, ...result } = user;
       return result;
-    }else{
+    } else {
       throw '密码不正确';
 
     }
@@ -61,13 +61,13 @@ export class userService {
     const TokenPayload = {
       sub: user.id, key: user.phone ? `phone:${user.phone}` : `email:${user.email}`
     };
- 
+
     const accessToken = this.jwtService.sign(TokenPayload);
 
     // 生成 refresh_token
-
     const refreshToken = this.jwtService.sign(TokenPayload, {
       expiresIn: '7d', // refresh_token 有效期为 7 天
+      secret: process.env.JWT_refreshSECRET || 'wintsa_refresh', // 使用自定义密钥
     });
 
     // 计算 token 的生效时间和过期时间
@@ -126,6 +126,7 @@ export class userService {
 
     const refreshToken = this.jwtService.sign(TokenPayload, {
       expiresIn: '7d', // refresh_token 有效期为 7 天
+      secret: process.env.JWT_refreshSECRET || 'wintsa_refresh', // 使用自定义密钥
     });
 
     // 计算 token 的生效时间和过期时间
