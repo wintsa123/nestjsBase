@@ -40,15 +40,47 @@ export class userService {
     });
   }
 
+  async validateUser(phone: number, email: string, password: string): Promise<any> {
+    const user = await this.findOne({ phone, email });
 
+    if (!user) {
+      throw '用户不存在';
+
+    }
+    if (user && await bcrypt.compare(password, user.password)) {
+      const { password, ...result } = user;
+      return result;
+    }else{
+      throw '密码不正确';
+
+    }
+  }
 
   async login(user: any) {
     console.log(user)
     const TokenPayload = {
       sub: user.id, key: user.phone ? `phone:${user.phone}` : `email:${user.email}`
     };
+ 
+    const accessToken = this.jwtService.sign(TokenPayload);
+
+    // 生成 refresh_token
+
+    const refreshToken = this.jwtService.sign(TokenPayload, {
+      expiresIn: '7d', // refresh_token 有效期为 7 天
+    });
+
+    // 计算 token 的生效时间和过期时间
+    const now = Math.floor(Date.now() / 1000); // 当前时间（秒）
+    const accessTokenExpiresIn = 3600; // access_token 有效期为 1 小时（秒）
+    const accessTokenExpiresAt = now + accessTokenExpiresIn; // 过期时间
+
+    // 返回结果
+    // const { password, ...result } = savedUser; // 排除密码字段
     return {
-      access_token: this.jwtService.sign(TokenPayload),
+      token: accessToken,
+      refresh_token: refreshToken,
+      tokenExpireTime: accessTokenExpiresAt
     };
   }
   async register(userData: { phone: number; password: string; email: string }) {

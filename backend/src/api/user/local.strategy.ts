@@ -1,14 +1,12 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { userService } from './user.service';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-    constructor(private readonly authService: AuthService) {
+    constructor(private readonly userClass: userService) {
         super({
-          
-
             usernameField: 'phone', // 默认字段
             passwordField: 'password',
             passReqToCallback: true, // 允许传递 req 对象
@@ -19,7 +17,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
        
         const {  email }: any = req.body;
 
-        const user = await this.authService.validateUser(phone, email, password);
+        const user = await this.userClass.validateUser(phone, email, password);
         if (!user) {
             throw new UnauthorizedException();
         }

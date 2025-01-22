@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Post, Put, Query, Req, Res, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
 import { TmpRedisService } from './tmp-redis.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SkipAuth } from '@src/decorators/skip-auth';
+import { Public } from '@src/decorators/Public';
 import { url } from './dto/url.dto';
 import { RedisCacheApi } from '@src/decorators';
 @ApiTags('utils')
 @Controller('tmp-redis')
-@SkipAuth() // 跳过控制器级别的验证
+@Public() // 跳过控制器级别的验证
 
 export class TmpRedisController {
   constructor(private readonly tmpRedisService: TmpRedisService,

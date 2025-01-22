@@ -16,6 +16,7 @@ import { ApiModule } from './api/api.module';
 import { PluginModule } from './plugin/plugin.module';
 import { SocketModule } from './socket/socket.module';
 import { CronModule } from './corn/rebot.module';
+import { JwtAuthGuard } from './guard/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -88,7 +89,11 @@ import { CronModule } from './corn/rebot.module';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
-    }
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
    
   ],
 })

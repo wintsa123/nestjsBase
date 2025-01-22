@@ -20,6 +20,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let resultCode = 1;
 
     const { code, msg, ...oth } = exception
+ 
 
     Logger.log(exception, '错误提示');
 
@@ -27,7 +28,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       status,
       message: msg,
       code: resultCode, // 自定义code
-      params: typeof exception=='string'?exception:oth,
+      params: typeof exception=='string'?exception:oth.response,
       path: request.url, // 错误的url地址
       method: request.method, // 请求方式
       timestamp: new Date().toLocaleDateString(), // 错误的时间

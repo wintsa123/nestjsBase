@@ -28,24 +28,24 @@ export class ApiInterceptor implements NestInterceptor {
     if (this.whiteUrlList.includes(newUrl)) {
       return next.handle();
     }
-    if (user) {
-      const {
-        userInfo: { accountType },
-      } = user;
-      if (accountType == AccountTypeEnum.SUPER_ACCOUNT) {
-        return next.handle();
-      }
-      // 表示已经登录的
-      const currentItem = user.authApi.find((item) => item.method == method && item.url == newUrl);
-      if (currentItem) {
-        return next.handle();
-      } else {
-        throw new HttpException(
-          JSON.stringify({ code: 10034, message: '你没权限访问' }),
-          HttpStatus.OK
-        );
-      }
-    }
+    // if (user) {
+    //   const {
+    //     userInfo: { accountType },
+    //   } = user;
+    //   if (accountType == AccountTypeEnum.SUPER_ACCOUNT) {
+    //     return next.handle();
+    //   }
+    //   // 表示已经登录的
+    //   const currentItem = user.authApi.find((item) => item.method == method && item.url == newUrl);
+    //   if (currentItem) {
+    //     return next.handle();
+    //   } else {
+    //     throw new HttpException(
+    //       JSON.stringify({ code: 10034, message: '你没权限访问' }),
+    //       HttpStatus.OK
+    //     );
+    //   }
+    // }
     return next.handle();
   }
 }
