@@ -8,6 +8,7 @@
   "scripts": {
     "copy-static-files": "node copy-static-files.js",
     "build": "nest build && node copy-static-files",
+    "newSql": "npx prisma db push",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "cross-env RUNNING_ENV=dev nest start",
     "dev": "cross-env RUNNING_ENV=dev nest start --watch ",
