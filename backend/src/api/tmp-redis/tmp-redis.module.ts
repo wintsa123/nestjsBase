@@ -2,7 +2,6 @@ import {  Module } from '@nestjs/common';
 import { TmpRedisService } from './tmp-redis.service';
 import { TmpRedisController } from './tmp-redis.controller';
 import { RouterModule } from '@nestjs/core';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -13,7 +12,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         module: TmpRedisModule,
       },
     ]),
-    TypeOrmModule.forFeature([]),
 
   ],
   controllers: [TmpRedisController],

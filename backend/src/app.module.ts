@@ -1,7 +1,6 @@
 import { ClassSerializerInterceptor, Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import {
@@ -26,31 +25,7 @@ import { JwtAuthGuard } from './guard/jwt-auth.guard';
       load: [getConfig], // 加载配置文件
     }),
     // mysql的连接
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return (
-          {
-            type: 'mysql',
-            name: "default",
-            host: String(configService.get('datasource.host')),
-            port: Number.parseInt(configService.get('datasource.port') ?? '3306'),
-            username: String(configService.get('datasource.username')),
-            password: String(configService.get('datasource.password')),
-            database: String(configService.get('datasource.database')),
-            entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            logging: configService.get('datasource.logging'),
-            timezone: '+08:00', // 东八区
-            autoLoadEntities: true,
-            synchronize:  false, // 自动同步表结构
-            cache: {
-              duration: 60000, // 1分钟的缓存
-            },
-          }
-        )
-      },
-    }),
+  
 
     CronModule,
     ApiModule,

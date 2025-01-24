@@ -1,16 +1,13 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { UserEntity } from './entities/user.entity';
+
 import * as bcrypt from 'bcrypt';
 import { user } from './dto/user.dto';
 
 @Injectable()
 export class userService {
   constructor(
-    @InjectRepository(UserEntity)
-    private usersRepository: Repository<UserEntity>,
+
     private jwtService: JwtService,
   ) { }
 
@@ -33,11 +30,11 @@ export class userService {
     if (whereConditions.length === 0) {
       throw '必须提供 phone 或 email 其中一项'
     }
-
+return whereConditions
     // 执行查询（OR 条件）
-    return await this.usersRepository.findOne({
-      where: whereConditions
-    });
+    // return await this.usersRepository.findOne({
+    //   where: whereConditions
+    // });
   }
 
   async validateUser(phone: number, email: string, password: string): Promise<any> {
@@ -86,9 +83,12 @@ export class userService {
   async register(userData: { phone: number; password: string; email: string }) {
     // 检查手机号是否已注册
     if (userData.phone) {
-      const existingUserByPhone = await this.usersRepository.findOne({
-        where: { phone: userData.phone },
-      });
+      const existingUserByPhone = [
+        
+      ]
+      // const existingUserByPhone = await this.usersRepository.findOne({
+      //   where: { phone: userData.phone },
+      // });
       if (existingUserByPhone) {
         throw new UnauthorizedException('该手机已被注册');
       }
@@ -96,9 +96,12 @@ export class userService {
 
     // 检查邮箱是否已注册
     if (userData.email) {
-      const existingUserByEmail = await this.usersRepository.findOne({
-        where: { email: userData.email },
-      });
+      // const existingUserByEmail = await this.usersRepository.findOne({
+      //   where: { email: userData.email },
+      // });
+      const existingUserByEmail = [
+        
+      ]
       if (existingUserByEmail) {
         throw new UnauthorizedException('该邮箱已被注册');
       }
@@ -107,15 +110,15 @@ export class userService {
     // 哈希密码
     const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-    // 创建用户
-    const user = new UserEntity({
-      ...userData,
-      password: hashedPassword,
-    });
+    // // 创建用户
+    // const user = new UserEntity({
+    //   ...userData,
+    //   password: hashedPassword,
+    // });
 
-    // 保存用户
-    const savedUser = await this.usersRepository.save(user);
-
+    // // 保存用户
+    // const savedUser = await this.usersRepository.save(user);
+const savedUser = {id:1,phone:12345678901,email:"12345678901"}
     // 生成 access_token
     const TokenPayload = {
       sub: savedUser.id, key: savedUser.phone ? `phone:${savedUser.phone}` : `email:${savedUser.email}`
