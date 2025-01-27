@@ -6,10 +6,11 @@ import { IpToAddressService } from './lbsMap/ip-to-address.service';
 import {  LngLat } from './lbsMap/get-longitude-latitude';
 
 import { UploadImgService } from './file/upload-img.service';
+import { PrismaService } from './prisma/prisma.service';
 
 @Global()
 @Module({
-  providers: [LoggerService, ToolsService, RedisService, IpToAddressService, UploadImgService,LngLat],
-  exports: [LoggerService, ToolsService, RedisService, IpToAddressService, UploadImgService,LngLat],
+  providers: [LoggerService, ToolsService, RedisService, IpToAddressService, UploadImgService,LngLat,PrismaService],
+  exports: [LoggerService, ToolsService, RedisService, IpToAddressService, UploadImgService,LngLat,PrismaService],
 })
 export class PluginModule {}

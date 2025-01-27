@@ -126,3 +126,16 @@ export const transformedResult = (data) => data.map(row => {
   }
   return newRow;
 });
+/**
+ * @Author: wintsa
+ * @Date: 2025-01-27 
+ * @LastEditors: wintsa
+ * @Description: bBigInt转换
+ * @returns {*} 
+ */
+export const BigIntreplacer=(obj) => {
+  return JSON.parse(JSON.stringify(
+    obj,
+    (_key, value) => (typeof value === 'bigint' ? value.toString() : value) // return everything else unchanged
+  ))
+}

@@ -26,6 +26,8 @@ export class AuthController {
 
 
   @Post('test')
+  @Public() // 跳过控制器级别的验证
+
   async test(
     @Body() registerData: user
   ) {
