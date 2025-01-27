@@ -80,6 +80,17 @@ async function bootstrap() {
       .setDescription('临时接口调试')
       .setVersion('1.0')
       .setLicense('Apache 2.0', 'http://www.apache.org/licenses/LICENSE-2.0.html')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          name: 'JWT',
+          description: '输入 JWT Token',
+          in: 'header',
+        },
+        'JWT-auth', // 安全方案的名称（可自定义）
+      )
       .build();
 
     const fastifyInstance = app.getHttpAdapter().getInstance();

@@ -16,7 +16,7 @@ export class userService {
     private logger: LoggerService,
   ) { }
 
-  async findOne(userData: { phone?: number | null; email?: string | null }) : Promise<Prisma.UserCreateInput>{
+  async findOne(userData: { phone?: number | null; email?: string | null }) : Promise<Prisma.UserWhereUniqueInput>{
     try {
 
       const whereConditions: any = {};
@@ -67,7 +67,6 @@ export class userService {
   }
 
   async login(user: any) {
-    console.log(user)
     const TokenPayload = {
       sub: user.id, key: user.phone ? `phone:${user.phone}` : `email:${user.email}`
     };

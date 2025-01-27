@@ -1,6 +1,6 @@
 # 电子族谱系统
 
-一个现代化的电子族谱管理系统，基于Vue 3 + NestJS + MySQL构建。
+一个现代化的电子族谱管理系统，基于Vue 3 + NestJS + 数据库：PostgreSQL构建。
 
 ## 主要功能
 
@@ -22,7 +22,7 @@
 
 - 前端：Vue 3 + TypeScript + Vite
 - 后端：NestJS + TypeScript
-- 数据库：MySQL
+- 数据库：PostgreSQL
 - UI框架：Element Plus
 
 ## 项目结构
@@ -42,8 +42,6 @@
               └── tmp-redis.controller.ts # redis控制器
               └── tmp-redis.service.ts # redis服务
               └── tmp-redis.module.ts # redis模块
-            └── auth # auth验证模块
-              └── auth.module.ts # auth验证模块
          └── main.ts    # NestJS 应用入口
          └── app.module.ts # 应用模块
          └── socket # socket模块

@@ -1,18 +1,23 @@
 import { UseInterceptors,Controller, Post, Body, UseGuards, Request, ClassSerializerInterceptor, Req } from '@nestjs/common';
 import { userService } from './user.service';
 import { user } from './dto/user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Public } from '@src/decorators/Public';
 
 // import { LocalAuthGuard } from './local-auth.guard';
 @ApiTags('user')
-@Controller('auth')
+@Controller('user')
 export class AuthController {
   constructor(private authService: userService) {}
   @Public() // 跳过控制器级别的验证
   @UseGuards(AuthGuard('local'))
   @Post('login')
+  @ApiOperation({ summary: '用户登录' })
+  @ApiBody({
+    description: '用户名和密码用于用户登录',
+    type: user,  // 指定请求体结构
+  })
   async login(@Req() req: Request|any) {
     return this.authService.login(req.user);
   }
@@ -26,7 +31,7 @@ export class AuthController {
 
 
   @Post('test')
-  @Public() // 跳过控制器级别的验证
+  @ApiBearerAuth('JWT-auth') // 与 main.ts 中定义的安全方案名称一致
 
   async test(
     @Body() registerData: user

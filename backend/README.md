@@ -11,28 +11,23 @@
 
 - 3、在项目的根目录的`.env`文件修改为你自己的数据库基本配置(地址、用户名、密码、数据库)
 
-  ```properties
-  DB_HOST=localhost
-  DB_USERNAME=root
-  DB_PASSWORD=123456
-  DB_DATABASE=nestjs-mysql
-  ```
+
 
 - 4、安装依赖包
    ```js
-    npmp install
+    pnpm install
    ```
    
    window环境 务必将项目下的oracle的bin添加进环境变量
 - 5、启动项目
 
   ```shell
-  yarn run dev
+  pnpm run dev
   ```
 - 6、更新同步项目
 
   ```shell
-  yarn run update
+  pnpm run update
   ```
 
 
@@ -49,11 +44,11 @@
 - [x] `ecosystem.config.js`是采用`PM2`的配置文件,项目开发完后直接运行命令一键部署
 
   ```shell
-  npmp run build
+  pnpm run build
   # 开发环境
-  npmp run pm2:dev
+  pnpm run pm2:dev
   # 生产环境
-  npmp run pm2:prod
+  pnpm run pm2:prod
   ```
 
 - [x] `winston`日志系统根据小时来划分日志管理,如果要实时查看日志，直接使用`PM2`查看日志
