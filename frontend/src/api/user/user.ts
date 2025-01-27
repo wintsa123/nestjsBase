@@ -1,7 +1,7 @@
 import { alovaInstance } from "..";
 
 export const refreshToken: any = () => {
-    const method = alovaInstance.Get('/refresh_token');
+    const method = alovaInstance.Post('/refresh');
     method.meta = {
         authRole: 'refreshToken'
     };
@@ -9,21 +9,21 @@ export const refreshToken: any = () => {
 };
 
 export const login = () => {
-    const method = alovaInstance.Get('/login');
+    const method = alovaInstance.Post('/user/login');
     method.meta = {
         authRole: 'login'
     };
     return method;
 };
 export const register = () => {
-    const method = alovaInstance.Get('/register');
+    const method = alovaInstance.Post('/user/register');
     method.meta = {
         authRole: 'login'
     };
     return method;
 };
 export const logout = () => {
-    const method = alovaInstance.Get('/logout');
+    const method = alovaInstance.Post('/user/logout');
     method.meta = {
         authRole: 'logout'
     };

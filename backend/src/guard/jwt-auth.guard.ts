@@ -22,6 +22,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const request = context.switchToHttp().getRequest();
     const clientIP = request.ip;
     if (clientIP == '127.0.0.1' || clientIP == '::1') {
+      request.user = {
+        "userId": 2,
+        "key": "phone:17666503623"
+      }
       return true;
     }
     return super.canActivate(context);

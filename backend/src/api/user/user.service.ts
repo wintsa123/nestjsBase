@@ -7,6 +7,7 @@ import { PrismaService } from '@src/plugin/prisma/prisma.service';
 import { LoggerService } from '@src/plugin/logger/logger.service';
 import { Prisma } from '@prisma/client';
 import { BigIntreplacer } from '@src/utils';
+import { CurrentUser } from '@src/decorators';
 
 @Injectable()
 export class userService {
@@ -16,9 +17,8 @@ export class userService {
     private logger: LoggerService,
   ) { }
 
-  async findOne(userData: { phone?: number | null; email?: string | null }) : Promise<Prisma.UserWhereUniqueInput>{
+  async findOne(userData: { phone?: number | null; email?: string | null }): Promise<Prisma.UserWhereUniqueInput> {
     try {
-
       const whereConditions: any = {};
 
       // 检查并添加有效的phone条件
@@ -30,7 +30,7 @@ export class userService {
       if (userData.email != null) {
         whereConditions['email'] = userData.email;
       }
-      
+
       // 如果至少有一个条件（phone或email），执行查询
       if (Object.keys(whereConditions).length === 0) {
         throw new Error('必须提供 phone 或 email 其中一项');
@@ -60,7 +60,7 @@ export class userService {
         throw '密码不正确';
 
       }
-    } catch (error:any) {
+    } catch (error: any) {
       this.logger.error(error)
       throw error.meta.cause
     }
@@ -162,5 +162,53 @@ export class userService {
       this.logger.error(error)
       throw error
     }
+  }
+
+  /**
+   * @Author: wintsa
+   * @Date: 2025-01-27 
+   * @LastEditors: wintsa
+   * @Description: 生产新的 refresh_token和token
+   * @returns {*} 
+   */
+  async refresh(refreshToken: string) {
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token is required');
+    }
+
+    // 验证 refresh_token 是否有效
+    let payload;
+    try {
+      payload = this.jwtService.verify(refreshToken, { secret: process.env.JWT_refreshSECRET || 'wintsa_refresh' });
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+
+      // 签发新的 access_token 和 refresh_token
+      let newPayload = { sub: payload.sub, key: payload.key }
+
+      const accessToken = await this.jwtService.sign(
+        newPayload
+      );
+      const newRefreshToken = await this.jwtService.sign(
+        newPayload, { secret: process.env.JWT_refreshSECRET || 'wintsa_refresh', expiresIn: '7d' }
+      );
+
+      // 计算 token 的生效时间和过期时间
+      const now = Math.floor(Date.now() / 1000); // 当前时间（秒）
+      const accessTokenExpiresIn = 3600; // access_token 有效期为 1 小时（秒）
+      const accessTokenExpiresAt = now + accessTokenExpiresIn; // 过期时间
+
+      // 返回结果
+      return {
+        token: accessToken,
+        refresh_token: newRefreshToken,
+        tokenExpireTime: accessTokenExpiresAt
+      };
+    }
+  
+  async test() {
+
   }
 }
