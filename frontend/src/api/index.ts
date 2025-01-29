@@ -31,7 +31,7 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
     isExpired: method => {
       const tokenExpireTime = localStorage.getItem('tokenExpireTime');
       if (!tokenExpireTime) return true;
-      return parseInt(tokenExpireTime) > Math.floor(Date.now() / 1000);
+      return parseInt(tokenExpireTime) < Math.floor(Date.now() / 1000);
     },
 
     // 当token过期时触发，在此函数中触发刷新token

@@ -37,8 +37,8 @@ export class AuthController {
   // @ApiBody({
   //   description: '更新token',
   // })
-  async refresh(@Body() refreshToken: string) {
-     return this.authService.refresh(refreshToken);
+  async refresh(@Body() data: {refreshToken:string}) {
+     return this.authService.refresh(data.refreshToken);
   }
   @Post('test')
   @ApiBearerAuth('JWT-auth') // 与 main.ts 中定义的安全方案名称一致

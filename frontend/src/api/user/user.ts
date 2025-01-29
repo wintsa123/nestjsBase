@@ -1,7 +1,7 @@
 import { alovaInstance } from "..";
 
 export const refreshToken: any = (data: {refreshToken:string}) => {
-    const method = alovaInstance.Post('/refresh',data);
+    const method = alovaInstance.Post('/user/refresh',data);
     method.meta = {
         authRole: 'refreshToken'
     };

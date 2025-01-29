@@ -175,12 +175,15 @@ export class userService {
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token is required');
     }
+    console.log(refreshToken,'refreshToken')
 
     // 验证 refresh_token 是否有效
     let payload;
     try {
       payload = this.jwtService.verify(refreshToken, { secret: process.env.JWT_refreshSECRET || 'wintsa_refresh' });
     } catch (error) {
+      console.log(error,'error')
+
       throw new UnauthorizedException('Invalid refresh token');
     }
 

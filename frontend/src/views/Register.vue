@@ -54,12 +54,10 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '../stores/user'
 import { ElMessage } from 'element-plus'
 import { User, Lock, Message } from '@element-plus/icons-vue'
 
 const router = useRouter()
-const userStore = useUserStore()
 const loading = ref(false)
 
 const registerForm = reactive({
@@ -101,13 +99,8 @@ const rules = {
 const handleRegister = async () => {
   loading.value = true
   try {
-    await userStore.register({
-      username: registerForm.username,
-      password: registerForm.password,
-      email: registerForm.email
-    })
+    await register({username: registerForm.username, password: registerForm.password, email: registerForm.email})
     ElMessage.success('注册成功')
-    router.push('/login')
   } catch (error) {
     ElMessage.error('注册失败，请稍后重试')
   } finally {
