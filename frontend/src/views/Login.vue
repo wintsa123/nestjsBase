@@ -3,10 +3,10 @@
     <el-card class="login-card">
       <h2>登录</h2>
       <el-form :model="loginForm" :rules="rules" ref="loginFormRef">
-        <el-form-item prop="username">
+        <el-form-item prop="phone">
           <el-input 
-            v-model="loginForm.username" 
-            placeholder="用户名"
+            v-model="loginForm.phone" 
+            placeholder="手机号"
             prefix-icon="User"
           />
         </el-form-item>
@@ -37,35 +37,38 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '../stores/user'
 import { ElMessage } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
+import { login,test } from '../api/user/user'
 
 const router = useRouter()
-const userStore = useUserStore()
 const loading = ref(false)
 
 const loginForm = reactive({
-  username: '',
+  phone: '',
   password: ''
 })
 
 const rules = {
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  phone: [{ required: true, message: '请输入手机号', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
 const handleLogin = async () => {
   loading.value = true
   try {
-    const success = await userStore.login(loginForm.username, loginForm.password)
+
+    const success = await login({phone: loginForm.phone, password: loginForm.password})
+    console.log(success)
     if (success) {
+      await test()
       ElMessage.success('登录成功')
-      router.push('/family-tree')
+      // router.push('/family-tree')
     } else {
-      ElMessage.error('登录失败，请检查用户名和密码')
+      ElMessage.error('登录失败，请检查手机号和密码')
     }
   } catch (error) {
+    console.log(error,'error')
     ElMessage.error('登录时发生错误')
   } finally {
     loading.value = false
@@ -76,6 +79,7 @@ const handleLogin = async () => {
 <style scoped>
 .login-container {
   height: 100vh;
+  width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;

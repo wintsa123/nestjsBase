@@ -5,7 +5,7 @@
         <h1>电子族谱系统</h1>
         <p class="subtitle">记录和管理您的家族历史</p>
         
-        <div class="action-buttons" v-if="!userStore.token">
+        <div class="action-buttons" >
           <el-button type="primary" @click="$router.push('/login')" size="large">
             登录
           </el-button>
@@ -14,7 +14,7 @@
           </el-button>
         </div>
         
-        <div v-else>
+        <div >
           <el-button type="primary" @click="$router.push('/family-tree')" size="large">
             进入族谱
           </el-button>
@@ -64,9 +64,7 @@
 
 <script setup lang="ts">
 import { User, Connection, Share } from '@element-plus/icons-vue'
-import { useUserStore } from '../stores/user'
 
-const userStore = useUserStore()
 </script>
 
 <style scoped>

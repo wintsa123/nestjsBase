@@ -24,12 +24,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new Error('User not found');
     }
     let isValid = false;
+
+
     if (key.startsWith('phone:')) {
       const phone = key.replace('phone:', '');
-      isValid = user.phone === phone;
+      isValid = user.phone == phone;
     } else if (key.startsWith('email:')) {
       const email = key.replace('email:', '');
-      isValid = user.email === email;
+      isValid = user.email == email;
     }
     if (!isValid) {
       throw new Error('Invalid key');

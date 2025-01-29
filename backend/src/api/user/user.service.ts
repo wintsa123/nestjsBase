@@ -62,7 +62,7 @@ export class userService {
       }
     } catch (error: any) {
       this.logger.error(error)
-      throw error.meta.cause
+      throw error.meta?.cause || error
     }
   }
 

@@ -20,15 +20,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let resultCode = 1;
 
     const { code, msg, ...oth } = exception
- 
+
 
     Logger.log(exception, '错误提示');
-
     const errorResponse = {
       status,
       message: msg,
       code: resultCode, // 自定义code
-      params: typeof exception=='string'?exception:oth.response,
+      params: typeof exception == 'string' ? exception : oth.response,
       path: request.url, // 错误的url地址
       method: request.method, // 请求方式
       timestamp: new Date().toLocaleDateString(), // 错误的时间
@@ -39,6 +38,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       JSON.stringify(errorResponse),
       'HttpExceptionFilter'
     );
+    console.log(errorResponse, 'errorResponse')
     // 设置返回的状态码、请求头、发送错误信息
     response.status(status);
     response.header('Content-Type', 'application/json; charset=utf-8');
