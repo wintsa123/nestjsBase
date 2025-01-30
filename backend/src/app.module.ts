@@ -16,6 +16,7 @@ import { PluginModule } from './plugin/plugin.module';
 import { SocketModule } from './socket/socket.module';
 import { CronModule } from './corn/rebot.module';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
+import { TransformInterceptor } from './interceptors/transfrom';
 
 @Module({
   imports: [
@@ -69,6 +70,10 @@ import { JwtAuthGuard } from './guard/jwt-auth.guard';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    }
    
   ],
 })

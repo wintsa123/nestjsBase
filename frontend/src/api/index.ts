@@ -3,6 +3,7 @@ import { createAlova } from 'alova';
 import adapterFetch from 'alova/fetch';
 import VueHook from 'alova/vue';
 import { refreshToken } from './user/user';
+import { ElMessage } from 'element-plus';
 const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthentication<
   typeof VueHook
 >({
@@ -10,14 +11,20 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
     method.config.headers.Authorization = 'Bearer '+localStorage.getItem('token');
   },
   async login(response: any, method) {
-    const data =  await response.clone().json()
-    console.log(data,'data')
-    
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('refresh_token', data.refresh_token);
-    localStorage.setItem('tokenExpireTime', data.tokenExpireTime);
+    console.log(method)
+    const data =  await response.clone().json()    
+    if (data.code==0) {
+      
+      ElMessage.success(data.data.message)
+      localStorage.setItem('token', data.data.token);
+      localStorage.setItem('refresh_token', data.data.refresh_token);
+      localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
+    } else {
+      console.log(data)
+      ElMessage.error(data.params.message)
+    }
+ 
     // location.href = '/';
-    return data
 
   },
   logout(response, method) {
@@ -38,9 +45,16 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
     handler: async method => {
       try {
         const { data } = await refreshToken({ refreshToken: localStorage.getItem('refresh_token') });
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('refresh_token', data.refresh_token);
-        localStorage.setItem('tokenExpireTime', data.tokenExpireTime);
+        console.log(data,'refreshToken')
+        if (data.code==0) {
+          ElMessage.success('登录成功')
+          localStorage.setItem('token', data.data.token);
+          localStorage.setItem('refresh_token', data.data.refresh_token);
+          localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
+        } else {
+          ElMessage.error(data.params.message)
+        }
+     
 
       } catch (error) {
         // token刷新失败，跳转回登录页

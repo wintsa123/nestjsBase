@@ -3,21 +3,12 @@
     <el-card class="login-card">
       <h2>登录</h2>
       <el-form :model="loginForm" :rules="rules" ref="loginFormRef">
-        <el-form-item prop="phone">
-          <el-input 
-            v-model="loginForm.phone" 
-            placeholder="手机号"
-            prefix-icon="User"
-          />
+        <el-form-item prop="username">
+          <el-input v-model="loginForm.username" placeholder="手机号或者邮箱" prefix-icon="User" />
         </el-form-item>
-        
+
         <el-form-item prop="password">
-          <el-input 
-            v-model="loginForm.password" 
-            type="password" 
-            placeholder="密码"
-            prefix-icon="Lock"
-          />
+          <el-input v-model="loginForm.password" type="password" placeholder="密码" prefix-icon="Lock" />
         </el-form-item>
 
         <el-form-item>
@@ -35,43 +26,56 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import {  reactive } from 'vue'
 import { ElMessage } from 'element-plus'
-import { User, Lock } from '@element-plus/icons-vue'
-import { login,test } from '../api/user/user'
+import { login } from '../api/user/user'
+import { useRequest } from 'alova/client'
 
-const router = useRouter()
-const loading = ref(false)
+const { loading, send: loginFn }: any = useRequest((params) => login(params),{immediate: false})
 
 const loginForm = reactive({
-  phone: '',
+  username: '',
   password: ''
 })
+const validateEmailOrPhone = (rule: any, value: string, callback: any) => {
+  if (value === '') {
+    callback(new Error('请输入手机号或者邮箱'));
+    return;
+  }
 
+  // 手机号正则表达式（以中国大陆手机号为例）
+  const phoneRegex = /^1[3-9]\d{9}$/;
+
+  // 邮箱正则表达式
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  if (phoneRegex.test(value) || emailRegex.test(value)) {
+    callback(); // 验证通过
+  } else {
+    callback(new Error('请输入有效的手机号或邮箱')); // 验证失败
+  }
+};
 const rules = {
-  phone: [{ required: true, message: '请输入手机号', trigger: 'blur' }],
+  username: [{ required: true, message: '请输入手机号或者邮箱', trigger: 'blur' },{ validator: validateEmailOrPhone, trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
 const handleLogin = async () => {
-  loading.value = true
   try {
+    const phoneRegex = /^1[3-9]\d{9}$/;
 
-    const success = await login({phone: loginForm.phone, password: loginForm.password})
-    console.log(success)
-    if (success) {
-      await test()
-      ElMessage.success('登录成功')
-      // router.push('/family-tree')
-    } else {
-      ElMessage.error('登录失败，请检查手机号和密码')
-    }
-  } catch (error) {
-    console.log(error,'error')
-    ElMessage.error('登录时发生错误')
-  } finally {
-    loading.value = false
+// 邮箱正则表达式
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+if (!phoneRegex.test(loginForm.username) && !emailRegex.test(loginForm.username)) {
+  throw new Error('请输入有效的手机号或邮箱')
+}
+    const params = {
+      [loginForm.username.includes('@') ? 'email' : 'phone']: loginForm.username,
+      password: loginForm.password
+    };
+    loginFn(params)
+  } catch (error:any) {
+    ElMessage.error(error.message)
   }
 }
 </script>

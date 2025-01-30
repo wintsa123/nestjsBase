@@ -2,12 +2,10 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import * as bcrypt from 'bcrypt';
-import { user } from './dto/user.dto';
 import { PrismaService } from '@src/plugin/prisma/prisma.service';
 import { LoggerService } from '@src/plugin/logger/logger.service';
 import { Prisma } from '@prisma/client';
 import { BigIntreplacer } from '@src/utils';
-import { CurrentUser } from '@src/decorators';
 
 @Injectable()
 export class userService {
