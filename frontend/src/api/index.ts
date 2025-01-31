@@ -29,6 +29,7 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
     localStorage.removeItem('token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('tokenExpireTime');
+    location.href = '/login';
 
   },
   refreshToken: {

@@ -38,11 +38,18 @@ export class AuthController {
   }
   @Post('test')
   @ApiBearerAuth('JWT-auth') // 与 main.ts 中定义的安全方案名称一致
-
   async test(
     @Req() req: Request | any
   ) {
     const user = req.user;
     return user;
+  }
+  @Post('logout')
+  @ApiBearerAuth('JWT-auth') // 与 main.ts 中定义的安全方案名称一致
+  async logout(
+    @Req() req: Request | any
+  ) {
+    const user = req.user;
+    return this.authService.logout(user);
   }
 }

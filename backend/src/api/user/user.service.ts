@@ -76,7 +76,7 @@ export class userService {
 
     // 生成 refresh_token
     const redisKey = `user:${user.id}:version`; // Redis key 为 用户 ID + 版本号
-      const refreshPayload = { sub: user.id, version: 1 };
+    const refreshPayload = { sub: user.id, version: 1 };
     const refreshToken = this.jwtService.sign(refreshPayload, {
       expiresIn: '7d', // refresh_token 有效期为 7 天
       secret: process.env.JWT_refreshSECRET || 'wintsa_refresh', // 使用自定义密钥
@@ -84,7 +84,7 @@ export class userService {
 
     // 计算 token 的生效时间和过期时间
     const now = Math.floor(Date.now() / 1000); // 当前时间（秒）
-   
+
     const redisExpireTime = now + 7 * 24 * 60 * 60; // 设置为 7 天有效期
     await this.redisService.set(redisKey, 1, redisExpireTime); // 更新版本号
     // 返回结果
@@ -92,7 +92,7 @@ export class userService {
     return {
       token: accessToken,
       refresh_token: refreshToken,
-      tokenExpireTime: now +3600
+      tokenExpireTime: now + 3600
     };
   }
   async register(userData: { phone: number; password: string; email: string }) {
@@ -160,7 +160,7 @@ export class userService {
       return {
         token: accessToken,
         refresh_token: refreshToken,
-        tokenExpireTime: now+3600
+        tokenExpireTime: now + 3600
       };
     } catch (error: any) {
       this.logger.error(error)
@@ -221,7 +221,18 @@ export class userService {
       tokenExpireTime: now + 3600
     };
   }
-
+  /**
+   * @Author: wintsa
+   * @Date: 2025-01-31 
+   * @LastEditors: wintsa
+   * @Description: 清空用户token
+   * @returns {*} 
+   */
+  async logout(user) {
+    // 清除 Redis 中的用户版本号
+    const redisKey = `user:${user.id}:version`; // Redis key 为 用户 ID + 版本号
+    await this.redisService.del(redisKey);
+  }
   async test() {
 
   }
