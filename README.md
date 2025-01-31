@@ -33,7 +33,7 @@
 ### 环境要求
 - Node.js (推荐版本 >= 16.x)
 - PostgreSQL
-- npm 或 yarn
+- pnpm或者yarn
 
 ### 安装步骤
 1. **克隆仓库**
