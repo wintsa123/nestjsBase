@@ -8,7 +8,7 @@
 - **后端**
   - <img src="https://nestjs.com/img/logo-small.svg" width="20" alt="NestJS Logo"> [NestJS 10](https://nestjs.com/)
   - <img src="https://www.postgresql.org/media/img/about/press/elephant.png" width="20" alt="PostgreSQL Logo"> [PostgreSQL](https://www.postgresql.org/)
-  - <img src="https://prismalens.vercel.app/header-logo.svg" width="20" alt="Prisma Logo"> [Prisma ORM](https://www.prisma.io/)
+  - <img src="https://docs.nestjs.com/assets/favicons/favicon-32x32.png" width="20" alt="Prisma Logo"> [Prisma ORM](https://www.prisma.io/)
   - <img src="https://jwt.io/img/pic_logo.svg" width="20" alt="JWT Logo"> [JWT (JSON Web Tokens)](https://jwt.io/) 验证
 
 - **前端**
