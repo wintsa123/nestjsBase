@@ -6,16 +6,16 @@
 
 ## 技术栈
 - **后端**
-  - [NestJS 10](https://nestjs.com/)
-  - [PostgreSQL](https://www.postgresql.org/)
-  - [Prisma ORM](https://www.prisma.io/)
-  - [JWT (JSON Web Tokens)](https://jwt.io/) 验证
+  - <img src="https://nestjs.com/img/logo-small.svg" width="20" alt="NestJS Logo"> [NestJS 10](https://nestjs.com/)
+  - <img src="https://www.postgresql.org/media/img/about/press/elephant.png" width="20" alt="PostgreSQL Logo"> [PostgreSQL](https://www.postgresql.org/)
+  - <img src="https://prismalens.vercel.app/header-logo.svg" width="20" alt="Prisma Logo"> [Prisma ORM](https://www.prisma.io/)
+  - <img src="https://jwt.io/img/pic_logo.svg" width="20" alt="JWT Logo"> [JWT (JSON Web Tokens)](https://jwt.io/) 验证
 
 - **前端**
-  - [Vue 3](https://vuejs.org/)
-  - [TypeScript](https://www.typescriptlang.org/)
-  - [Element Plus](https://element-plus.org/)
-  - [alovaJs v3](https://alova.js.org/)
+  - <img src="https://vuejs.org/images/logo.png" width="20" alt="Vue Logo"> [Vue 3](https://vuejs.org/)
+  - <img src="https://www.typescriptlang.org/favicon-32x32.png" width="20" alt="TypeScript Logo"> [TypeScript](https://www.typescriptlang.org/)
+  - <img src="https://element-plus.org/images/element-plus-logo-small.svg" width="20" alt="Element Plus Logo"> [Element Plus](https://element-plus.org/)
+  - <img src="https://alova.js.org/img/favicon.ico" width="20" alt="alovaJs Logo"> [alovaJs v3](https://alova.js.org/)
 
 ## 功能特性
 - 用户注册与登录与退出
@@ -37,17 +37,16 @@
 
 ### 安装步骤
 1. **克隆仓库**
-git clone xxx.git && cd ..
-cd backend
-pnpm install
+- git clone xxx.git && cd ..
+- cd backend
+- pnpm install
 
-cd frontend
-pnpm install
+- cd frontend
+- pnpm install
 
 2. **配置环境变量**
 -  配置数据库
 - 复制.env.example文件为.env，并填写你的PostgreSQL数据库连接信息。
-- 在 backend 目录下创建 `.env` 文件
 
 3. **运行项目**
 -  在backend运行 `npx prisma migrate dev --name init` 命令初始化数据库
