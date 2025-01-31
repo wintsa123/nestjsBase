@@ -14,13 +14,11 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
     console.log(method)
     const data =  await response.clone().json()    
     if (data.code==0) {
-      
-      ElMessage.success(data.data.message)
+      ElMessage.success(data.message)
       localStorage.setItem('token', data.data.token);
       localStorage.setItem('refresh_token', data.data.refresh_token);
       localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
     } else {
-      console.log(data)
       ElMessage.error(data.params.message)
     }
  
@@ -45,7 +43,6 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
     handler: async method => {
       try {
         const { data } = await refreshToken({ refreshToken: localStorage.getItem('refresh_token') });
-        console.log(data,'refreshToken')
         if (data.code==0) {
           ElMessage.success('登录成功')
           localStorage.setItem('token', data.data.token);

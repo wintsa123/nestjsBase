@@ -19,7 +19,6 @@ export class AuthController {
     type: user,  // 指定请求体结构
   })
   async login(@Req() req: Request | any) {
-    console.log(req.user)
     return this.authService.login(req.user);
   }
 
@@ -34,9 +33,6 @@ export class AuthController {
 
   @Public() // 跳过控制器级别的验证
   @Post('refresh')
-  // @ApiBody({
-  //   description: '更新token',
-  // })
   async refresh(@Body() data: {refreshToken:string}) {
      return this.authService.refresh(data.refreshToken);
   }

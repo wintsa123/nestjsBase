@@ -18,12 +18,11 @@ export class TransformInterceptor implements NestInterceptor {
 
     // 根据接口动态设置 message
     let customMessage = '请求成功'; // 默认消息
-
     if (url.includes('/wxchat/getMsg')) {
       customMessage = '获取消息成功';
     } else if (url.includes('/user/register') && method === 'POST') {
       customMessage = '注册成功，即将进入族谱';
-    } else if (url.includes('/user/login') && method === 'PUT') {
+    } else if (url.includes('/user/login') && method === 'POST') {
       customMessage = '登录成功';
     }
 
