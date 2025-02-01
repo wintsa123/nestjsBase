@@ -95,7 +95,7 @@ export class userService {
       tokenExpireTime: now + 3600
     };
   }
-  async register(userData: { phone: number; password: string; email: string }) {
+  async register(userData: { phone: number; password: string; email: string ,realname: string,sex: number}) {
     try {
 
 
@@ -133,6 +133,8 @@ export class userService {
       const hashedPassword = await bcrypt.hash(userData.password, 10);
       users.password = hashedPassword
 
+      users.realname = userData.realname
+      users.sex = userData.sex
 
       //  保存用户
 

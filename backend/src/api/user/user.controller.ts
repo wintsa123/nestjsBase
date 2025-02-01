@@ -4,6 +4,7 @@ import { user } from './dto/user.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Public } from '@src/decorators/Public';
+import { register } from './dto/register.dto';
 
 // import { LocalAuthGuard } from './local-auth.guard';
 @ApiTags('user')
@@ -26,7 +27,7 @@ export class AuthController {
   @Post('register')
 
   async register(
-    @Body() registerData: user
+    @Body() registerData: register
   ) {
     return this.authService.register(registerData);
   }

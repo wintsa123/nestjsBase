@@ -15,11 +15,11 @@ const router = createRouter({
       path: '/register',
       component: () => import('../views/Register.vue')
     },
-    // {
-    //   path: '/family-tree',
-    //   component: () => import('../views/FamilyTree.vue'),
-    //   meta: { requiresAuth: true }
-    // }
+    {
+      path: '/development-plan',
+      component: () => import('../views/DevelopmentPlan.vue'),
+      // meta: { requiresAuth: true }
+    }
   ]
 })
 

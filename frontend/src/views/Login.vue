@@ -2,13 +2,13 @@
   <div class="login-container">
     <el-card class="login-card">
       <h2>登录</h2>
-      <el-form :model="loginForm" :rules="rules" ref="loginFormRef">
+      <el-form :model="form" :rules="rules" ref="formRef">
         <el-form-item prop="username">
-          <el-input v-model="loginForm.username" placeholder="手机号或者邮箱" prefix-icon="User" />
+          <el-input v-model="form.username" placeholder="手机号或者邮箱" prefix-icon="User" />
         </el-form-item>
 
         <el-form-item prop="password">
-          <el-input v-model="loginForm.password" type="password" placeholder="密码" prefix-icon="Lock" />
+          <el-input v-model="form.password" type="password" placeholder="密码" prefix-icon="Lock" />
         </el-form-item>
 
         <el-form-item>
@@ -26,17 +26,48 @@
 </template>
 
 <script setup lang="ts">
-import {  reactive } from 'vue'
+import { reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { login } from '../api/user/user'
 import { useRequest } from 'alova/client'
+import { useForm } from 'alova/client';
+const {
+  // 提交状态
+  loading,
 
-const { loading, send: loginFn }: any = useRequest((params) => login(params),{immediate: false})
+  // 响应式的表单数据，内容由initialForm决定
+  form,
 
-const loginForm = reactive({
-  username: '',
-  password: ''
-})
+  // 提交数据函数
+  send: loginFn,
+
+  // 提交成功回调绑定
+  onSuccess,
+
+  // 提交失败回调绑定
+  onError,
+
+  // 提交完成回调绑定
+  onComplete
+} = useForm(
+  formData => {
+    // 可以在此转换表单数据并提交
+    const params = {
+      [formData.username.includes('@') ? 'email' : 'phone']: formData.username,
+      password: formData.password
+    };
+    return login(params);
+  },
+  {
+    // 初始化表单数据
+    initialForm: {
+      username: '',
+      password: ''
+    }
+  }
+);
+
+
 const validateEmailOrPhone = (rule: any, value: string, callback: any) => {
   if (value === '') {
     callback(new Error('请输入手机号或者邮箱'));
@@ -56,7 +87,7 @@ const validateEmailOrPhone = (rule: any, value: string, callback: any) => {
   }
 };
 const rules = {
-  username: [{ required: true, message: '请输入手机号或者邮箱', trigger: 'blur' },{ validator: validateEmailOrPhone, trigger: 'blur' }],
+  username: [{ required: true, message: '请输入手机号或者邮箱', trigger: 'blur' }, { validator: validateEmailOrPhone, trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
@@ -64,17 +95,14 @@ const handleLogin = async () => {
   try {
     const phoneRegex = /^1[3-9]\d{9}$/;
 
-// 邮箱正则表达式
-const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-if (!phoneRegex.test(loginForm.username) && !emailRegex.test(loginForm.username)) {
-  throw new Error('请输入有效的手机号或邮箱')
-}
-    const params = {
-      [loginForm.username.includes('@') ? 'email' : 'phone']: loginForm.username,
-      password: loginForm.password
-    };
-    loginFn(params)
-  } catch (error:any) {
+    // 邮箱正则表达式
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!phoneRegex.test(form.value.username) && !emailRegex.test(form.value.username)) {
+      throw new Error('请输入有效的手机号或邮箱')
+    }
+   
+    loginFn()
+  } catch (error: any) {
     ElMessage.error(error.message)
   }
 }

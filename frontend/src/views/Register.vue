@@ -2,17 +2,28 @@
   <div class="register-container">
     <el-card class="register-card">
       <h2>注册</h2>
-      <el-form :model="registerForm" :rules="rules" ref="registerFormRef">
-        <el-form-item prop="username">
-          <el-input v-model="registerForm.username" placeholder="用户名" prefix-icon="User" />
-        </el-form-item>
+      <el-form :model="form" :rules="rules" ref="formRef">
 
+        <el-form-item prop="realname">
+          <el-input v-model="form.realname" placeholder="真实姓名" prefix-icon="User" />
+        </el-form-item>
+        <el-form-item prop="sex" label="性别">
+
+          <el-radio-group v-model="form.sex">
+            <el-radio label="男">男</el-radio>
+            <el-radio label="女">女</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item prop="username">
+          <el-input v-model="form.username" placeholder="手机号或是邮箱" prefix-icon="User" />
+        </el-form-item>
         <el-form-item prop="password">
-          <el-input v-model="registerForm.password" type="password" placeholder="密码" prefix-icon="Lock" />
+          <el-input v-model="form.password" type="password" placeholder="密码" prefix-icon="Lock" />
         </el-form-item>
 
         <el-form-item prop="confirmPassword">
-          <el-input v-model="registerForm.confirmPassword" type="password" placeholder="确认密码" prefix-icon="Lock" />
+          <el-input v-model="form.confirmPassword" type="password" placeholder="确认密码" prefix-icon="Lock"
+            class="no-cursor-on-icon" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleRegister" :loading="loading" class="register-button">
@@ -32,20 +43,15 @@
 import { reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { register } from '@/api/user/user'
-import { useRequest } from 'alova/client'
+import { useForm, useRequest } from 'alova/client'
 
-const { loading, send: registerFn }: any = useRequest((params) => register(params), { immediate: false })
 
-const registerForm = reactive({
-  username: '',
-  password: '',
-  confirmPassword: '',
-})
+
 
 const validatePass2 = (rule: any, value: string, callback: any) => {
   if (value === '') {
     callback(new Error('请再次输入密码'))
-  } else if (value !== registerForm.password) {
+  } else if (value !== form.value.password) {
     callback(new Error('两次输入密码不一致!'))
   } else {
     callback()
@@ -85,7 +91,46 @@ const rules = {
     { validator: validatePass2, trigger: 'blur' }
   ]
 }
+const {
+  // 提交状态
+  loading,
 
+  // 响应式的表单数据，内容由initialForm决定
+  form,
+
+  // 提交数据函数
+  send: registerFn,
+
+  // 提交成功回调绑定
+  onSuccess,
+
+  // 提交失败回调绑定
+  onError,
+
+  // 提交完成回调绑定
+  onComplete
+} = useForm(
+  formData => {
+    // 可以在此转换表单数据并提交
+    const params = {
+      [formData.username.includes('@') ? 'email' : 'phone']: formData.username,
+      password: formData.password,
+      realname: formData.realname,
+      sex: formData.sex
+    };
+    return register(params);
+  },
+  {
+    // 初始化表单数据
+    initialForm: {
+      username: '',
+      password: '',
+      confirmPassword: '',
+      realname: '',
+      sex: '',
+    }
+  }
+);
 const handleRegister = async () => {
   try {
 
@@ -93,18 +138,15 @@ const handleRegister = async () => {
 
     // 邮箱正则表达式
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!phoneRegex.test(registerForm.username) && !emailRegex.test(registerForm.username)) {
+    if (!phoneRegex.test(form.value.username) && !emailRegex.test(form.value.username)) {
       throw new Error('请输入有效的手机号或邮箱')
     }
 
-    if (registerForm.confirmPassword !== registerForm.password) {
+    if (form.value.confirmPassword !== form.value.password) {
       throw new Error('两次输入密码不一致!')
     }
-    const params = {
-      [registerForm.username.includes('@') ? 'email' : 'phone']: registerForm.username,
-      password: registerForm.password
-    };
-    registerFn(params)
+   
+    registerFn()
   } catch (error: any) {
     ElMessage.error(error.message)
   }
@@ -138,5 +180,10 @@ h2 {
   text-align: center;
   margin-bottom: 30px;
   color: #303133;
+}
+
+.no-cursor-on-icon .el-input__prefix {
+  pointer-events: none;
+  /* 禁用图标区域的点击事件 */
 }
 </style>
