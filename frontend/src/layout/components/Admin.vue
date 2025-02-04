@@ -17,7 +17,9 @@
 
       <el-scrollbar max-height="100vh">
 
-        <el-menu :default-active="activeMenu" router unique-opened style="height: 100vh">
+        <el-menu :default-active="activeMenu" router unique-opened style="height: 100vh" :collapse="isCollapse"
+    @open="handleOpen"
+    @close="handleClose">
           <!-- 递归渲染菜单项 -->
           <menu-item v-for="item in menuItems" :key="item.path" :item="item" />
         </el-menu>
@@ -44,7 +46,13 @@ import MenuItem from '@/components/MenuItem/MenuItem.vue'; // 引入递归组件
 
 // 获取当前路由
 const route = useRoute();
-
+const isCollapse = ref(false)
+const handleOpen = (key , keyPath) => {
+  console.log(key, keyPath)
+}
+const handleClose = (key , keyPath) => {
+  console.log(key, keyPath)
+}
 // 获取 Pinia Store 中的菜单数据
 const menuStore = useMenuStore();
 const { menuItems } = toRefs(menuStore);

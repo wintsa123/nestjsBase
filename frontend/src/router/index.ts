@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { Connection, EditPen, Link, Menu } from '@element-plus/icons-vue'; // 导入 Element Plus 图标组件
 
 const router = createRouter({
   history: createWebHistory(),
@@ -28,7 +29,7 @@ const router = createRouter({
             meta: {
               nav: true, // 表示该路由需要显示在导航菜单中
               title: '仪表盘', // 菜单名称
-              icon: 'el-icon-menu', // 菜单图标
+              icon: Menu , // 菜单图标
               sortid: 1,
             },
           },
@@ -39,7 +40,7 @@ const router = createRouter({
             meta: {
               nav: true, // 表示该路由需要显示在导航菜单中
               title: '族谱', // 菜单名称
-              icon: 'el-icon-menu', // 菜单图标
+              icon: Connection , // 菜单图标
               sortid: 2,
       
             },
@@ -50,7 +51,7 @@ const router = createRouter({
             meta: {
               nav: true, // 表示该路由需要显示在导航菜单中
               title: '开发计划', // 菜单名称
-              icon: 'el-icon-menu', // 菜单图标
+              icon: EditPen , // 菜单图标
               sortid: 4,
       
             },
