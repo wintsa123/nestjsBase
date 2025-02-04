@@ -18,11 +18,12 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
       localStorage.setItem('token', data.data.token);
       localStorage.setItem('refresh_token', data.data.refresh_token);
       localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
+      location.href = '/admin';
+
     } else {
       ElMessage.error(data.params.message)
     }
  
-    // location.href = '/';
 
   },
   logout(response, method) {

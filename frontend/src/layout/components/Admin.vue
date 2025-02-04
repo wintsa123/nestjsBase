@@ -5,15 +5,15 @@
     <el-aside width="200px" style="  overflow: hidden; /* 允许滚动 */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE 和 Edge */">
-<RouterLink to="/" >
-  <div class="flex items-center">
-  <img src="../../assets/logo.svg" alt="Logo" class="w-[100px] h-auto mr-2">
-  <h2 class="font-bold text-xl m-0">
-    电子族谱
-  </h2>
-</div>
+      <RouterLink to="/">
+        <div class="flex items-center">
+          <img src="../../assets/logo.svg" alt="Logo" class="w-[100px] h-auto mr-2">
+          <h2 class="font-bold text-xl m-0">
+            电子族谱
+          </h2>
+        </div>
 
-</RouterLink>
+      </RouterLink>
 
       <el-scrollbar max-height="100vh">
 
@@ -69,7 +69,8 @@ onMounted(() => {
   .el-menu {
     border-right: none;
   } */
-  .el-aside ul{
-    border-right: none;
-  }
+.el-aside ul {
+  border-right: none;
+  background-color: var(--background-color);
+}
 </style>

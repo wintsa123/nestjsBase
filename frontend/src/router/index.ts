@@ -15,26 +15,51 @@ const router = createRouter({
       path: '/register',
       component: () => import('../views/Register.vue')
     },
-    {
-      path: '/development-plan',
-      component: () => import('../views/DevelopmentPlan.vue'),
-      // meta: { requiresAuth: true }
-    },
+    
     {
       path: '/admin',
       component: () => import('../layout/components/Admin.vue'),
+      
+        children: [
+          {
+            path: '/dashboard',
+            name: 'Dashboard',
+            component: () => import('../views/Dashboard.vue'),
+            meta: {
+              nav: true, // 表示该路由需要显示在导航菜单中
+              title: '仪表盘', // 菜单名称
+              icon: 'el-icon-menu', // 菜单图标
+              sortid: 1,
+            },
+          },
+          {
+            path: '/familyTree',
+            name: 'familyTree',
+            component: () => import('../views/familyTree.vue'),
+            meta: {
+              nav: true, // 表示该路由需要显示在导航菜单中
+              title: '族谱', // 菜单名称
+              icon: 'el-icon-menu', // 菜单图标
+              sortid: 2,
+      
+            },
+          },
+          {
+            path: '/development-plan',
+            component: () => import('../views/DevelopmentPlan.vue'),
+            meta: {
+              nav: true, // 表示该路由需要显示在导航菜单中
+              title: '开发计划', // 菜单名称
+              icon: 'el-icon-menu', // 菜单图标
+              sortid: 4,
+      
+            },
+          },
+        ]
+      
       // meta: { requiresAuth: true }
     },
-    {
-      path: '/dashboard',
-      name: 'Dashboard',
-      component: () => import('../views/Dashboard.vue'),
-      meta: {
-        nav: true, // 表示该路由需要显示在导航菜单中
-        title: '仪表盘', // 菜单名称
-        icon: 'el-icon-menu', // 菜单图标
-      },
-    },
+   
    
     // {
     //   path: '/settings',
