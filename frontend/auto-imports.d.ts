@@ -65,6 +65,7 @@ declare global {
   const useCssVars: typeof import('vue')['useCssVars']
   const useId: typeof import('vue')['useId']
   const useLink: typeof import('vue-router')['useLink']
+  const useMenuStore: typeof import('./src/stores/nav')['useMenuStore']
   const useModel: typeof import('vue')['useModel']
   const usePagination: typeof import('alova/client')['usePagination']
   const useReguest: typeof import('alova/client')['useReguest']

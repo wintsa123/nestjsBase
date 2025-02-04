@@ -1,27 +1,34 @@
 <template>
   <div class="register-container">
+    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+        <!-- 图片居中 -->
+        <img class="mx-auto h-auto w-1/2" src="@/assets/logo.svg" alt="Your Company" style="margin: 0 auto;">
+
+        <!-- 标题在图片下方 -->
+        <h2 class="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">注册您的帐户</h2>
+      </div>
     <el-card class="register-card">
-      <h2>注册</h2>
+      
       <el-form :model="form" :rules="rules" ref="formRef">
 
-        <el-form-item prop="realname">
+        <el-form-item prop="realname" label="真实姓名" label-position="top">
           <el-input v-model="form.realname" placeholder="真实姓名" prefix-icon="User" />
         </el-form-item>
-        <el-form-item prop="sex" label="性别">
+        <el-form-item prop="sex" label="性别" label-position="top">
 
-          <el-radio-group v-model="form.sex">
+          <el-radio-group v-model="form.sex" >
             <el-radio label="男">男</el-radio>
             <el-radio label="女">女</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item prop="username">
+        <el-form-item prop="username" label="账号" label-position="top">
           <el-input v-model="form.username" placeholder="手机号或是邮箱" prefix-icon="User" />
         </el-form-item>
-        <el-form-item prop="password">
+        <el-form-item prop="password" label="密码" label-position="top">
           <el-input v-model="form.password" type="password" placeholder="密码" prefix-icon="Lock" />
         </el-form-item>
 
-        <el-form-item prop="confirmPassword">
+        <el-form-item prop="confirmPassword" label="确认密码" label-position="top">
           <el-input v-model="form.confirmPassword" type="password" placeholder="确认密码" prefix-icon="Lock"
             class="no-cursor-on-icon" />
         </el-form-item>
@@ -76,6 +83,13 @@ const validateEmailOrPhone = (rule: any, value: string, callback: any) => {
   }
 };
 const rules = {
+  sex: [
+    { required: true, message: '请选择性别', trigger: 'change' }
+  ],
+  realname: [
+    { required: true, message: '请输入真实姓名', trigger: 'blur' },
+    { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
+  ],
   username: [
     { required: true, message: '请输入手机号或者邮箱', trigger: 'blur' },
     { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' },

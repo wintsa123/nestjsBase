@@ -1,35 +1,41 @@
 <template>
   <div class="login-container">
-    <el-card class="login-card">
-      <h2>登录</h2>
-      <el-form :model="form" :rules="rules" ref="formRef">
-        <el-form-item prop="username">
-          <el-input v-model="form.username" placeholder="手机号或者邮箱" prefix-icon="User" />
-        </el-form-item>
+    <div class="login-card">
+      <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+        <!-- 图片居中 -->
+        <img class="mx-auto h-auto w-1/2" src="@/assets/logo.svg" alt="Your Company" style="margin: 0 auto;">
 
-        <el-form-item prop="password">
-          <el-input v-model="form.password" type="password" placeholder="密码" prefix-icon="Lock" />
-        </el-form-item>
+        <!-- 标题在图片下方 -->
+        <h2 class="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">登录您的帐户</h2>
+      </div>
+      <el-card>
+        <el-form :model="form" :rules="rules" ref="formRef">
+          <el-form-item prop="username" label="账户" label-position="top" >
+            <el-input v-model="form.username" placeholder="手机号或者邮箱" prefix-icon="User" />
+          </el-form-item>
 
-        <el-form-item>
-          <el-button type="primary" @click="handleLogin" :loading="loading" class="login-button">
-            登录
-          </el-button>
-        </el-form-item>
+          <el-form-item prop="password" label="密码" label-position="top">
+            <el-input v-model="form.password" type="password" placeholder="密码" prefix-icon="Lock" />
+          </el-form-item>
 
-        <div class="register-link">
-          还没有账号？<router-link to="/register">立即注册</router-link>
-        </div>
-      </el-form>
-    </el-card>
+          <el-form-item>
+            <el-button type="primary" @click="handleLogin" :loading="loading" class="login-button">
+              登录
+            </el-button>
+          </el-form-item>
+
+          <div class="register-link">
+            还没有账号？<router-link to="/register">立即注册</router-link>
+          </div>
+        </el-form>
+      </el-card>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { login } from '../api/user/user'
-import { useRequest } from 'alova/client'
 import { useForm } from 'alova/client';
 const {
   // 提交状态
@@ -40,15 +46,6 @@ const {
 
   // 提交数据函数
   send: loginFn,
-
-  // 提交成功回调绑定
-  onSuccess,
-
-  // 提交失败回调绑定
-  onError,
-
-  // 提交完成回调绑定
-  onComplete
 } = useForm(
   formData => {
     // 可以在此转换表单数据并提交
@@ -100,7 +97,7 @@ const handleLogin = async () => {
     if (!phoneRegex.test(form.value.username) && !emailRegex.test(form.value.username)) {
       throw new Error('请输入有效的手机号或邮箱')
     }
-   
+
     loginFn()
   } catch (error: any) {
     ElMessage.error(error.message)

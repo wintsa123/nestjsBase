@@ -3,10 +3,13 @@ import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import path from 'path'
 
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [
     vue(),
+    tailwindcss(),
+
     AutoImport({
       imports: [
         'vue', // 自动导入 vue 函数

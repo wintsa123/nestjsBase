@@ -105,7 +105,7 @@ const tableData = ref<DevelopmentTask[]>(updateParentStatus([
       },
       {
         id: '1-5',
-        name: '更新用户的名称信息',
+        name: '更新用户的基础信息',
         status: '未开始',
         plannedTime: '',
         developer: 'wintsa',
@@ -132,9 +132,9 @@ const tableData = ref<DevelopmentTask[]>(updateParentStatus([
       {
         id: '2-2',
         name: '显示成员间的关系连接',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
+        status: '进行中',
+        plannedTime: '2025/2/2',
+        developer: 'wintsa',
         completionTime: ''
       },
       {

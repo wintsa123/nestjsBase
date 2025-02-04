@@ -85,6 +85,7 @@
     "usePagination": true,
     "useReguest": true,
     "useWatcher": true,
-    "useRequest": true
+    "useRequest": true,
+    "useMenuStore": true
   }
 }
