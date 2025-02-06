@@ -131,7 +131,7 @@ const tableData = ref<DevelopmentTask[]>(updateParentStatus([
       },
       {
         id: '2-2',
-        name: '显示成员间的关系连接',
+        name: '显示成员间的关系连接，显示的逻辑还需要分类，比如默认只显示三代/四代的全部树，超过的时候就只显示父系的树',
         status: '进行中',
         plannedTime: '2025/2/2',
         developer: 'wintsa',
@@ -240,8 +240,14 @@ const tableData = ref<DevelopmentTask[]>(updateParentStatus([
     plannedTime: '',
     developer: '',
     completionTime: '',
-    children: []
-  },
+    children: [{
+        id: '6-1',
+        name: '根据图片/视频(可以提取文字内容)/文字内容生成对话，并且根据上传的内容，学习语气',
+        status: '未开始',
+        plannedTime: '',
+        developer: '',
+        completionTime: ''
+      }]  },
   {
     id: '7',
     name: 'AI人脸相册',
@@ -249,9 +255,63 @@ const tableData = ref<DevelopmentTask[]>(updateParentStatus([
     plannedTime: '',
     developer: '',
     completionTime: '',
-    children: []
-  }
-]))
+    children: [{
+        id: '7-1',
+        name: '上传图片，人脸识别，可以合并',
+        status: '未开始',
+        plannedTime: '',
+        developer: '',
+        completionTime: ''
+      },{
+        id: '7-2',
+        name: '允许拍摄，通过人脸识别，让使用者方便查找此人是xxx哪个亲戚，应该叫的名称是什么',
+        status: '未开始',
+        plannedTime: '',
+        developer: '',
+        completionTime: ''
+      },]
+  },
+  {
+    id: '8',
+    name: 'UI设计美化优化',
+    status: '',
+    plannedTime: '',
+    developer: 'wintsa',
+    completionTime: '',
+    children: [
+      {
+        id: '8-1',
+        name: 'header栏',
+        status: '进行中',
+        plannedTime: '2025/2/5',
+        developer: 'wintsa',
+        completionTime: ''
+      },
+      {
+        id: '8-2',
+        name: 'aside栏的颜色搭配',
+        status: '进行中',
+        plannedTime: '2025/2/5',
+        developer: 'wintsa',
+        completionTime: ''
+      },
+      {
+        id: '8-3',
+        name: '注册和登录页面切换的动画过渡效果',
+        status: '未开始',
+        plannedTime: '',
+        developer: '',
+        completionTime: ''
+      },
+      {
+        id: '8-4',
+        name: '主页换成vitepress,静态页面方便被收录',
+        status: '未开始',
+        plannedTime: '',
+        developer: '',
+        completionTime: ''
+      }]
+  }]))
 
 
 const getStatusType = (status: string) => {

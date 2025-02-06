@@ -30,8 +30,14 @@
       <el-header>Header</el-header>
 
       <!-- 主内容区域 -->
-      <el-main>
+      <el-main style="  overflow: hidden; /* 允许滚动 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 和 Edge */">
+          <el-scrollbar max-height="100vh">
+
         <router-view />
+      </el-scrollbar>
+
       </el-main>
     </el-container>
 
