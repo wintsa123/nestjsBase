@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import path from 'path'
+import { VitePWA } from 'vite-plugin-pwa';
 
 import tailwindcss from '@tailwindcss/vite'
 
@@ -21,6 +22,7 @@ export default defineConfig({
   plugins: [
     vue(),
     tailwindcss(),
+    VitePWA({ registerType: 'autoUpdate' }),
     AutoImport({
       imports: [
         'vue', // 自动导入 vue 函数
