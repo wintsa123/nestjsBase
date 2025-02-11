@@ -21,7 +21,6 @@ export default defineConfig({
   plugins: [
     vue(),
     tailwindcss(),
-
     AutoImport({
       imports: [
         'vue', // 自动导入 vue 函数
@@ -50,6 +49,28 @@ export default defineConfig({
     
   ],
 
+  build: {
 
+    minify: 'terser',  // 使用 Terser 压缩
+    terserOptions: {
+      compress: {
+        drop_console: true, // 去掉 console.log
+        drop_debugger: true, // 去掉 debugger
+      }
+    },
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // 自定义代码分割逻辑
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        },
+        entryFileNames: 'assets/[name].[hash].js',   // JavaScript 文件
+        chunkFileNames: 'assets/[name].[hash].js',   // 分块文件
+        assetFileNames: 'assets/[name].[hash][extname]'  // 其他资源
+      }
+    }
+  }
 
 })
