@@ -4,6 +4,7 @@ import router  from '@/router'; // 引入路由实例
 export const useMenuStore = defineStore('menu', {
   state: () => ({
     menuItems: [],
+    isCollapse: true,
   }),
   actions: {
     // 解析路由配置，生成菜单数据
@@ -28,5 +29,8 @@ export const useMenuStore = defineStore('menu', {
           };
         })
     },
+   
+    persist: true // 可选，使用插件进行持久化
+
   },
 });

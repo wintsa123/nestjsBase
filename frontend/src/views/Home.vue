@@ -15,7 +15,7 @@
         </div>
         
         <div v-else>
-          <el-button type="primary" @click="$router.push('/family-tree')" size="large">
+          <el-button type="primary" @click="$router.push('/admin')" size="large">
             进入族谱
           </el-button>
         </div>
