@@ -6,6 +6,18 @@ import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': `${path.resolve(__dirname, 'src')}`, // 确保 @ 指向 src 目录
+    },
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@use "@/assets/element-variables.scss" as * ;`,
+      },
+    },
+  },
   plugins: [
     vue(),
     tailwindcss(),
@@ -35,10 +47,9 @@ export default defineConfig({
         globalsPropValue: true, // 将自动导入的变量注册为全局
       }, // 保证自动导入的函数既不触发 ESLint 的 no-undef 报错，也拥有完善的类型提示。默认不配置的话不会生成类型声明文件。
     }),
+    
   ],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'), // 确保 @ 指向 src 目录
-    },
-  },
+
+
+
 })
