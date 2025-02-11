@@ -9,22 +9,28 @@
         <el-header style=" padding: 0;height:auto;flex:1">
           <div>
             <RouterLink to="/">
-              <div class="flex items-center">
-                <img src="../../assets/logo.svg" alt="Logo" class="w-[100px] h-auto mr-2">
-                <h2 class="font-bold text-xl m-0" v-if="isCollapse">
+
+              <div class="flex items-center justify-center">
+                <img src="../../assets/logo.svg" alt="Logo" class=" h-auto mr-2" :style="{ width: '4em' }">
+                <transition name="fade">
+
+                <h2 :class="{ 'fade-in': !isRender }" class="  font-bold text-xl m-0" v-if="isRender" >
                   电子族谱
                 </h2>
+                </transition>
               </div>
+
             </RouterLink>
           </div>
         </el-header>
         <el-main style=" padding: 0;overflow: hidden; /* 允许滚动 */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none;flex:7">
-            <el-menu :default-active="activeMenu" router unique-opened style="height: 100%" :collapse="!isCollapse">
-              <!-- 递归渲染菜单项 -->
-              <menu-item v-for="item in menuItems" :key="item.path" :item="item" />
-            </el-menu>
+          <el-menu :default-active="activeMenu" router unique-opened style="height: 100%" :collapse="!isCollapse"
+            :collapse-transition="false">
+            <!-- 递归渲染菜单项 -->
+            <menu-item v-for="item in menuItems" :key="item.path" :item="item" />
+          </el-menu>
         </el-main>
         <el-footer style=" padding: 0;display: flex;justify-content: center;flex:1">
           <transition name="collapse-transition" mode="out-in">
@@ -70,7 +76,18 @@ const { menuItems, isCollapse } = toRefs(menuStore);
 
 // 动态设置当前激活的菜单项
 const activeMenu = computed(() => route.path);
+const isRender = ref(isCollapse.value);    // 控制是否渲染 h2
+console.log(isRender)
+watch(isCollapse, (newVal) => {
+  if (newVal) {
+    setTimeout(() => {
+      isRender.value = true;
 
+    }, 100);  // 延迟 500ms 渲染
+  } else {
+    isRender.value = false;
+  }
+});
 // 在组件挂载时生成菜单
 onMounted(() => {
   menuStore.generateMenuFromRoutes();
@@ -79,18 +96,20 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* .el-aside {
-    background-color: #304156;
-    color: #fff;
-  }
-
-
-  /* .el-menu {
-    border-right: none;
-  }  */
 .el-aside ul {
   border-right: none;
   background-color: var(--background-color);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.1s, transform 0.1s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(10px); /* 可选：添加位移效果 */
 }
 
 /* 进入/离开过渡 */
@@ -113,45 +132,16 @@ onMounted(() => {
   opacity: 1;
   transform: translateX(0);
 }
+
 .el-menu {
   will-change: height;
 }
-/* .el-aside {
-transition: width 0.15s !important;
--webkit-transition: width 0.15s !important;
--moz-transition: width 0.15s !important;
--webkit-transition: width 0.15s !important;
--o-transition: width 0.15s !important;
-}
-.el-menu {
-  transition: all 10ms;
-} */
-.el-menu-vertical-demo:not(.el-menu--collapse) {
-  width: 160px;
-  height: 100vh;
-  animation: show 0.2s linear !important;
-}
- 
-.el-menu--collapse {
-  width: 60px;
-  height: 100vh;
-  animation: hide 0.2s linear !important;
-}
- 
-@keyframes hide {
-  from {
-    width: 160px;
-  }
-  to {
-    width: 60px;
-  }
-}
-@keyframes show {
-  from {
-    width: 60px;
-  }
-  to {
-    width: 160px;
-  }
+
+.el-aside {
+  transition: width 0.3s;
+  -webkit-transition: width 0.3s;
+  -moz-transition: width 0.3s;
+  -webkit-transition: width 0.3s;
+  -o-transition: width 0.3s;
 }
 </style>
