@@ -11,6 +11,7 @@
             <RouterLink to="/">
 
               <div class="flex items-center justify-center">
+                
                 <img src="../../assets/logo.svg" alt="Logo" class=" h-auto mr-2" :style="{ width: '4em' }">
                 <transition name="fade">
 
@@ -83,7 +84,7 @@ watch(isCollapse, (newVal) => {
     setTimeout(() => {
       isRender.value = true;
 
-    }, 100);  // 延迟 500ms 渲染
+    }, 400);  // 延迟 500ms 渲染
   } else {
     isRender.value = false;
   }
@@ -101,11 +102,13 @@ onMounted(() => {
   background-color: var(--background-color);
 }
 
-.fade-enter-active,
+
 .fade-leave-active {
   transition: opacity 0.1s, transform 0.1s;
 }
-
+.fade-enter-active {
+  transition: opacity 1s, transform 1s;
+}
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
