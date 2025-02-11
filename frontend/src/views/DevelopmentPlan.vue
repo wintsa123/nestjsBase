@@ -44,6 +44,14 @@ interface DevelopmentTask {
 function updateParentStatus(rows: any[]) {
   rows.forEach(row => {
     if (row.children && row.children.length > 0) {
+      // 对子节点进行排序
+      row.children.sort((a: any, b: any) => {
+        const statusOrder = { '完成': 1, '进行中': 2, '未开始': 3 }; // 定义排序优先级
+        //@ts-ignore
+        return statusOrder[a.status] - statusOrder[b.status];
+      });
+
+      // 更新父节点状态
       const allCompleted = row.children.every((child: any) => child.status === '完成');
       const allInProgress = row.children.every((child: any) => child.status === '进行中');
       const hasCompleted = row.children.some((child: any) => child.status === '完成');
@@ -310,7 +318,14 @@ const tableData = ref<DevelopmentTask[]>(updateParentStatus([
         plannedTime: '',
         developer: '',
         completionTime: ''
-      }]
+      }, {
+        id: '8-5',
+        name: 'aside栏的收缩功能',
+        status: '完成',
+        plannedTime: '2025/2/4',
+        developer: 'wintsa',
+        completionTime: '2025/2/11'
+      },]
   }]))
 
 

@@ -30,7 +30,8 @@ export const useMenuStore = defineStore('menu', {
         })
     },
    
-    persist: true // 可选，使用插件进行持久化
 
   },
+  persist: true,  // 开启持久化
+
 });

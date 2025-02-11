@@ -11,13 +11,13 @@
             <RouterLink to="/">
 
               <div class="flex items-center justify-center">
-                
+
                 <img src="../../assets/logo.svg" alt="Logo" class=" h-auto mr-2" :style="{ width: '4em' }">
                 <transition name="fade">
 
-                <h2 :class="{ 'fade-in': !isRender }" class="  font-bold text-xl m-0" v-if="isRender" >
-                  电子族谱
-                </h2>
+                  <h2 :class="{ 'fade-in': !isRender }" class="  font-bold text-xl m-0" v-if="isRender">
+                    电子族谱
+                  </h2>
                 </transition>
               </div>
 
@@ -42,15 +42,19 @@
       </el-container>
     </el-aside>
     <el-container>
-      <el-header>Header</el-header>
+      <el-scrollbar max-height="100vh" style="width: 100%;">
+
+      <el-header style="text-align: right">
+        <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+      </el-header>
       <!-- 主内容区域 -->
       <el-main style="  overflow: hidden; /* 允许滚动 */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE 和 Edge */">
-        <el-scrollbar max-height="100vh">
           <router-view />
-        </el-scrollbar>
       </el-main>
+    </el-scrollbar>
+
     </el-container>
   </el-container>
 </template>
@@ -106,13 +110,16 @@ onMounted(() => {
 .fade-leave-active {
   transition: opacity 0.1s, transform 0.1s;
 }
+
 .fade-enter-active {
   transition: opacity 1s, transform 1s;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-  transform: translateX(10px); /* 可选：添加位移效果 */
+  transform: translateX(10px);
+  /* 可选：添加位移效果 */
 }
 
 /* 进入/离开过渡 */
