@@ -26,14 +26,14 @@
         </el-header>
         <el-main style=" padding: 0;overflow: hidden; /* 允许滚动 */
     scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;flex:7">
+    -ms-overflow-style: none;flex:18">
           <el-menu :default-active="activeMenu" router unique-opened style="height: 100%" :collapse="!isCollapse"
             :collapse-transition="false">
             <!-- 递归渲染菜单项 -->
             <menu-item v-for="item in menuItems" :key="item.path" :item="item" />
           </el-menu>
         </el-main>
-        <el-footer style=" padding: 0;display: flex;justify-content: center;flex:1">
+        <el-footer style=" padding: 0;display: flex;justify-content: center;flex:2">
           <transition name="collapse-transition" mode="out-in">
             <collapse-button-r v-if="!isCollapse" v-model:isCollapse="isCollapse" key="right" />
             <collapse-button-l v-else v-model:isCollapse="isCollapse" key="left" />
@@ -44,16 +44,16 @@
     <el-container>
       <el-scrollbar max-height="100vh" style="width: 100%;">
 
-      <el-header style="text-align: right">
-        <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
-      </el-header>
-      <!-- 主内容区域 -->
-      <el-main style="  overflow: hidden; /* 允许滚动 */
+        <el-header style="text-align: right">
+          <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+        </el-header>
+        <!-- 主内容区域 -->
+        <el-main style="  overflow: hidden; /* 允许滚动 */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE 和 Edge */">
           <router-view />
-      </el-main>
-    </el-scrollbar>
+        </el-main>
+      </el-scrollbar>
 
     </el-container>
   </el-container>
@@ -144,14 +144,18 @@ onMounted(() => {
 }
 
 .el-menu {
-  will-change: height;
+  will-change: auto;
 }
 
 .el-aside {
+  
   transition: width 0.3s;
   -webkit-transition: width 0.3s;
   -moz-transition: width 0.3s;
   -webkit-transition: width 0.3s;
   -o-transition: width 0.3s;
+  will-change: auto;
+  
+
 }
 </style>

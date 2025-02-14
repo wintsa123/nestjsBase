@@ -7,7 +7,6 @@ import { LoggerService } from '@src/plugin/logger/logger.service';
 import { Prisma } from '@prisma/client';
 import { BigIntreplacer } from '@src/utils';
 import { RedisService } from '@src/plugin/redis/redis.service';
-import { version } from 'os';
 
 @Injectable()
 export class userService {
@@ -18,7 +17,7 @@ export class userService {
     private readonly redisService: RedisService,
   ) { }
 
-  async findOne(userData: { phone?: number | null; email?: string | null }): Promise<Prisma.UserWhereUniqueInput> {
+  async findOne(userData: { phone?: string | null; email?: string | null }) {
     try {
       const whereConditions: any = {};
 
@@ -36,6 +35,7 @@ export class userService {
       if (Object.keys(whereConditions).length === 0) {
         throw new Error('必须提供 phone 或 email 其中一项');
       }
+      console.log(whereConditions)
       const user = await this.pgService.user.findUnique({
         where: whereConditions
       })
@@ -51,7 +51,7 @@ export class userService {
     }
   }
 
-  async validateUser(phone: number, email: string, password: string): Promise<any> {
+  async validateUser(phone: string, email: string, password: string): Promise<any> {
     try {
       const user = await this.findOne({ phone, email });
       if (user && await bcrypt.compare(password, user.password)) {
@@ -95,7 +95,7 @@ export class userService {
       tokenExpireTime: now + 3600
     };
   }
-  async register(userData: { phone: number; password: string; email: string ,realname: string,sex: number}) {
+  async register(userData: { phone: string; password: string; email: string ,realname: string,sex: number}) {
     try {
 
 

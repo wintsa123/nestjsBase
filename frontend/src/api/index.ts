@@ -21,7 +21,7 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
       location.href = '/admin';
 
     } else {
-      ElMessage.error(data.params.message)
+      ElMessage.error(data.message||data.params.message)
     }
  
 
@@ -51,7 +51,7 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
           localStorage.setItem('refresh_token', data.data.refresh_token);
           localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
         } else {
-          ElMessage.error(data.params.message)
+          ElMessage.error(data.message||data.params.message)
         }
      
 

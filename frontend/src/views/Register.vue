@@ -17,8 +17,8 @@
         <el-form-item prop="sex" label="性别" label-position="top">
 
           <el-radio-group v-model="form.sex" >
-            <el-radio label="男">男</el-radio>
-            <el-radio label="女">女</el-radio>
+            <el-radio label="1">男</el-radio>
+            <el-radio label="0">女</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item prop="username" label="账号" label-position="top">
@@ -47,10 +47,10 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { register } from '@/api/user/user'
-import { useForm, useRequest } from 'alova/client'
+import { useForm } from 'alova/client'
+import { hashPassword } from '@/util/string'
 
 
 
@@ -115,22 +115,15 @@ const {
   // 提交数据函数
   send: registerFn,
 
-  // 提交成功回调绑定
-  onSuccess,
 
-  // 提交失败回调绑定
-  onError,
-
-  // 提交完成回调绑定
-  onComplete
 } = useForm(
   formData => {
     // 可以在此转换表单数据并提交
     const params = {
       [formData.username.includes('@') ? 'email' : 'phone']: formData.username,
-      password: formData.password,
+      password: formData.realpassword,
       realname: formData.realname,
-      sex: formData.sex
+      sex: Number(formData.sex)
     };
     return register(params);
   },
@@ -142,6 +135,7 @@ const {
       confirmPassword: '',
       realname: '',
       sex: '',
+      realpassword:''
     }
   }
 );
@@ -159,7 +153,8 @@ const handleRegister = async () => {
     if (form.value.confirmPassword !== form.value.password) {
       throw new Error('两次输入密码不一致!')
     }
-   
+    form.value.realpassword=await hashPassword(form.value.password)
+
     registerFn()
   } catch (error: any) {
     ElMessage.error(error.message)

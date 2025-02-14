@@ -37,6 +37,8 @@
 import { ElMessage } from 'element-plus'
 import { login } from '../api/user/user'
 import { useForm } from 'alova/client';
+import { hashPassword } from '../util/string';
+
 const {
   // 提交状态
   loading,
@@ -47,19 +49,20 @@ const {
   // 提交数据函数
   send: loginFn,
 } = useForm(
-  formData => {
+   (formData) => {
     // 可以在此转换表单数据并提交
     const params = {
       [formData.username.includes('@') ? 'email' : 'phone']: formData.username,
-      password: formData.password
+      password: formData.realpassword
     };
     return login(params);
-  },
+  },/*  */
   {
     // 初始化表单数据
     initialForm: {
       username: '',
-      password: ''
+      password: '',
+      realpassword:''
     }
   }
 );
@@ -97,6 +100,7 @@ const handleLogin = async () => {
     if (!phoneRegex.test(form.value.username) && !emailRegex.test(form.value.username)) {
       throw new Error('请输入有效的手机号或邮箱')
     }
+    form.value.realpassword=await hashPassword(form.value.password)
 
     loginFn()
   } catch (error: any) {

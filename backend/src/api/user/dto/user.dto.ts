@@ -6,7 +6,7 @@ export class user extends PartialType(class { }) {
 
   @ApiProperty({ required: false })
 
-  phone!: number;
+  phone!: string;
   @ApiProperty({ required: true })
   @IsNotEmpty()
   password!: string;

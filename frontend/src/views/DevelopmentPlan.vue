@@ -326,7 +326,11 @@ const tableData = ref<DevelopmentTask[]>(updateParentStatus([
         developer: 'wintsa',
         completionTime: '2025/2/11'
       },]
-  }]))
+  }]).sort((a: any, b: any) => {
+        const statusOrder = { '完成': 1, '进行中': 2, '未开始': 3 }; // 定义排序优先级
+        //@ts-ignore
+        return statusOrder[a.status] - statusOrder[b.status];
+      }))
 
 
 const getStatusType = (status: string) => {

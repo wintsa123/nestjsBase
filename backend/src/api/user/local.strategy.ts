@@ -13,7 +13,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
         });
     }
 
-    async validate(req: Request, phone: number, password: string): Promise<any> {
+    async validate(req: Request, phone: string, password: string): Promise<any> {
        
         const {  email }: any = req.body;
 
