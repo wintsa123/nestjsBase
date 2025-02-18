@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import path from 'path'
 import { VitePWA } from 'vite-plugin-pwa';
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 import tailwindcss from '@tailwindcss/vite'
 
@@ -12,16 +13,11 @@ export default defineConfig({
       '@': `${path.resolve(__dirname, 'src')}`, // 确保 @ 指向 src 目录
     },
   },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        additionalData: `@use "@/assets/element-variables.scss" as * ;`,
-      },
-    },
-  },
+
   plugins: [
     vue(),
     tailwindcss(),
+  
     VitePWA({ registerType: 'autoUpdate' }),
     AutoImport({
       imports: [
@@ -38,6 +34,7 @@ export default defineConfig({
           imports: ['ElMessage', 'ElMessageBox']
         } // 从 element-plus 组件库中自动导入的函数
       ],
+      resolvers: [ElementPlusResolver()],
       dirs: [
         './src/stores/*.ts',
         './src/api'
@@ -47,8 +44,8 @@ export default defineConfig({
         // filepath: '.eslintrc-auto-import.json', // 自动生成的 ESLint 配置文件路径，可以手动设置存储位置，默认根目录下面。
         globalsPropValue: true, // 将自动导入的变量注册为全局
       }, // 保证自动导入的函数既不触发 ESLint 的 no-undef 报错，也拥有完善的类型提示。默认不配置的话不会生成类型声明文件。
-    }),
-    
+    })
+ 
   ],
 
   build: {
