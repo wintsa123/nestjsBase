@@ -298,10 +298,10 @@ const tableData = ref<DevelopmentTask[]>(updateParentStatus([
       {
         id: '8-2',
         name: 'aside栏的颜色搭配',
-        status: '进行中',
+        status: '完成',
         plannedTime: '2025/2/5',
         developer: 'wintsa',
-        completionTime: ''
+        completionTime: '2025/2/19'
       },
       {
         id: '8-3',

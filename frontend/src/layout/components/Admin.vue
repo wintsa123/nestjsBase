@@ -6,7 +6,7 @@
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE 和 Edge */">
       <el-container style=" height:100vh">
-        <el-header style=" padding: 0;height:auto;flex:1">
+        <el-header style="   padding: 1rem 0 ;height:auto;flex:1">
           <div>
             <RouterLink to="/">
 
@@ -44,7 +44,8 @@
     <el-container>
       <el-scrollbar max-height="100vh" style="width: 100%;">
 
-        <el-header style="text-align: right">
+        <el-header style="text-align: right ;  padding: 1rem 0 
+">
           <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
         </el-header>
         <!-- 主内容区域 -->
@@ -148,14 +149,29 @@ onMounted(() => {
 }
 
 .el-aside {
-  
   transition: width 0.3s;
   -webkit-transition: width 0.3s;
   -moz-transition: width 0.3s;
   -webkit-transition: width 0.3s;
   -o-transition: width 0.3s;
   will-change: auto;
-  
-
 }
+
+.el-menu-item.is-active {
+  background: linear-gradient(-72.47deg, rgb(var(--v-theme-primary)) 22.16%, rgba(var(--v-theme-primary), .7) 76.47%) !important;
+  /* background-color: var(--el-menu-active-color); */
+  color:var(--elcolor-on-primary);
+  border-radius: 0 3.125rem 3.125rem 0 !important;
+  box-shadow: 0 4px 14px -4px var(--v-shadow-key-umbra-opacity), 0 4px 8px -4px var(--v-shadow-key-penumbra-opacity), 0 4px 8px -4px var(--v-shadow-key-ambient-opacity);
+}
+
+.el-menu.el-menu--vertical .el-menu-item {
+    block-size: 2.825rem !important;
+    border-end-end-radius: 3.125rem !important;
+    border-end-start-radius: 0 !important;
+    border-start-end-radius: 3.125rem !important;
+    border-start-start-radius: 0 !important;
+    transition: margin-inline .15sease-in-out;
+    will-change: margin-inline;
+    }
 </style>

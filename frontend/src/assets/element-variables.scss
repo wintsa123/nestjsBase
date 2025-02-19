@@ -1,8 +1,9 @@
 @forward 'element-plus/theme-chalk/src/common/var.scss' with (
   $colors: (
     'primary': (
-      'base': green,
+      'base': rgb(86, 187, 86),
     ),
   )
 );
+
 @use "element-plus/theme-chalk/src/index.scss" as *;
