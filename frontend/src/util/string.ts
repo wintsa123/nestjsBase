@@ -1,3 +1,4 @@
+
 export const hashPassword = async (password:string) => {
     const encoder = new TextEncoder(); // 将字符串编码为 Uint8Array
     const data = encoder.encode(password); // 编码密码
@@ -9,3 +10,4 @@ export const hashPassword = async (password:string) => {
     
     return hashHex; // 返回十六进制哈希值
   };
+ 

@@ -1,4 +1,4 @@
-import { UseInterceptors, Controller, Post, Body, UseGuards, Request, ClassSerializerInterceptor, Req } from '@nestjs/common';
+import { UseInterceptors, Controller, Post, Body, UseGuards, Request, ClassSerializerInterceptor, Req, Res } from '@nestjs/common';
 import { userService } from './user.service';
 import { user } from './dto/user.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -19,8 +19,18 @@ export class AuthController {
     description: '用户名和密码用于用户登录',
     type: user,  // 指定请求体结构
   })
-  async login(@Req() req: Request | any) {
-    return this.authService.login(req.user);
+  async login(@Req() req: Request | any, @Res({ passthrough: true }) res) {
+    const { token, info, refresh_token } =   await  this.authService.login(req.user);
+
+    res.setCookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: 'none',
+      // domain: 'your-backend-domain.com',
+      path: '/user/refresh',
+    });
+    return({ token, info }) ;
   }
 
   @Public() // 跳过控制器级别的验证

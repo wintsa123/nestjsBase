@@ -27,8 +27,10 @@ model User {
   sex       Int?
   areaCode  String    @default("+86")
   role      Role      @default(USER)
+  address   String?
   profile   Profile?
-
+lat   Float?
+lng   Float?
   @@map("users")
 }
 

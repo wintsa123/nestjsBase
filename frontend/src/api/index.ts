@@ -11,16 +11,19 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
     method.config.headers.Authorization = 'Bearer '+localStorage.getItem('token');
   },
   async login(response: any, method) {
-    console.log(method)
-    const data =  await response.clone().json()    
+    const data =  await response.clone().json()   
+ 
     if (data.code==0) {
+
       ElMessage.success(data.message)
+      localStorage.setItem('userInfo', JSON.stringify(data.data.info));
       localStorage.setItem('token', data.data.token);
-      localStorage.setItem('refresh_token', data.data.refresh_token);
+      // localStorage.setItem('refresh_token', data.data.refresh_token);
       localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
-      location.href = '/admin';
+      // location.href = '/admin';
 
     } else {
+      console.log(data)
       ElMessage.error(data.message||data.params.message)
     }
  
@@ -36,9 +39,11 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
   refreshToken: {
     // 在请求前触发，将接收到method参数，并返回boolean表示token是否过期
     isExpired: method => {
+      console.log(1)
       const tokenExpireTime = localStorage.getItem('tokenExpireTime');
       if (!tokenExpireTime) return true;
-      return parseInt(tokenExpireTime) < Math.floor(Date.now() / 1000);
+      return true
+      // return parseInt(tokenExpireTime) < Math.floor(Date.now() / 1000);
     },
 
     // 当token过期时触发，在此函数中触发刷新token

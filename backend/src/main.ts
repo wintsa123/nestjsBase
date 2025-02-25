@@ -28,10 +28,11 @@ async function bootstrap() {
       "origin": "*",
       "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
       "preflightContinue": false,
-      "optionsSuccessStatus": 204,
+      "optionsSuccessStatus": 200,
       "credentials": true,
       allowedHeaders: '*', // 允许所有的请求头
       exposedHeaders: '*', // 允许所有的响应头
+
     });
     // 启动版本管理
     const Version = {
@@ -58,7 +59,7 @@ async function bootstrap() {
       },
     });
     app.register(fastifyCookie, {
-      secret: 'zw', // for cookies signature
+      secret: 'wintsa', // for cookies signature
     });
     app.register(fastifyCsrf);
 

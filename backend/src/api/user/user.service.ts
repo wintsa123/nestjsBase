@@ -35,7 +35,6 @@ export class userService {
       if (Object.keys(whereConditions).length === 0) {
         throw new Error('必须提供 phone 或 email 其中一项');
       }
-      console.log(whereConditions)
       const user = await this.pgService.user.findUnique({
         where: whereConditions
       })
@@ -71,7 +70,6 @@ export class userService {
     const TokenPayload = {
       sub: user.id, key: user.phone ? `phone:${user.phone}` : `email:${user.email}`
     };
-
     const accessToken = this.jwtService.sign(TokenPayload);
 
     // 生成 refresh_token
@@ -88,14 +86,15 @@ export class userService {
     const redisExpireTime = now + 7 * 24 * 60 * 60; // 设置为 7 天有效期
     await this.redisService.set(redisKey, 1, redisExpireTime); // 更新版本号
     // 返回结果
-    // const { password, ...result } = savedUser; // 排除密码字段
+
     return {
       token: accessToken,
+      info: { realname: user.realname, role: user.role ,phone: user.phone, email: user.email },
       refresh_token: refreshToken,
       tokenExpireTime: now + 3600
     };
   }
-  async register(userData: { phone: string; password: string; email: string ,realname: string,sex: number}) {
+  async register(userData: { phone: string; password: string; email: string, realname: string, sex: number }) {
     try {
 
 

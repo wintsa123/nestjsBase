@@ -17,8 +17,8 @@
         <el-form-item prop="sex" label="性别" label-position="top">
 
           <el-radio-group v-model="form.sex" >
-            <el-radio label="1">男</el-radio>
-            <el-radio label="0">女</el-radio>
+            <el-radio value="1">男</el-radio>
+            <el-radio value="0">女</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item prop="username" label="账号" label-position="top">
