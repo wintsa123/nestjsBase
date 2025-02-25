@@ -25,8 +25,8 @@ async function bootstrap() {
       logger: IS_DEV ? ['log', 'debug', 'error', 'warn'] : ['error', 'warn', 'debug'],
     });
     app.enableCors({
-      // "origin": "*",
-      origin: 'http://localhost:5173', // 设置允许的前端来源
+      "origin": "*",
+      // origin: 'http://localhost:5173', // 设置允许的前端来源
       "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
       "preflightContinue": false,
       "optionsSuccessStatus": 200,

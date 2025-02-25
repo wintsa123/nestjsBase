@@ -20,7 +20,7 @@ export class AuthController {
     type: user,  // 指定请求体结构
   })
   async login(@Req() req: Request | any, @Res({ passthrough: true }) _res) {
-    const { token, info, refresh_token } = await this.authService.login(req.user);
+    return await this.authService.login(req.user);
 
     // _res.setCookie('refresh_token', refresh_token, {
     //   httpOnly: false,
@@ -30,7 +30,6 @@ export class AuthController {
     //   domain: 'localhost:5173',
     //   path: '/',
     // });
-    return ({ token, info,refresh_token });
   }
 
   @Public() // 跳过控制器级别的验证
@@ -44,12 +43,10 @@ export class AuthController {
 
   @Public() // 跳过控制器级别的验证
   @Post('refresh')
-  async refresh(@Req() request: any) {
-    const cookies = request.cookies; // 获取所有 Cookie
-    console.log(cookies)
-    const refreshTokenFromCookie = cookies['refreshToken']; // 获取指定的 Cookie（假设你用的是 `refreshToken` 作为 Cookie 的键名）
-    console.log(refreshTokenFromCookie)
-    return this.authService.refresh(refreshTokenFromCookie);
+  async refresh(@Body() data: { refreshToken: string }) {
+    // const cookies = request.cookies; // 获取所有 Cookie
+    // const refreshTokenFromCookie = cookies['refreshToken']; // 获取指定的 Cookie（假设你用的是 `refreshToken` 作为 Cookie 的键名）
+    return this.authService.refresh(data.refreshToken);
   }
   @Post('test')
   @ApiBearerAuth('JWT-auth') // 与 main.ts 中定义的安全方案名称一致

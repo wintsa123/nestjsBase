@@ -19,6 +19,7 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
       localStorage.setItem('userInfo', JSON.stringify(data.data.info));
       localStorage.setItem('token', data.data.token);
       localStorage.setItem('refresh_token', data.data.refresh_token);
+      console.log(data.data.refresh_token)
       localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
       location.href = '/admin';
 
@@ -52,7 +53,6 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
       try {
         const { data } = await refreshToken({ refreshToken: localStorage.getItem('refresh_token') });
         if (data.code==0) {
-          ElMessage.success('登录成功')
           localStorage.setItem('token', data.data.token);
           localStorage.setItem('refresh_token', data.data.refresh_token);
           localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
