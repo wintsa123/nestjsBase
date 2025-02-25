@@ -25,12 +25,13 @@ async function bootstrap() {
       logger: IS_DEV ? ['log', 'debug', 'error', 'warn'] : ['error', 'warn', 'debug'],
     });
     app.enableCors({
-      "origin": "*",
+      // "origin": "*",
+      origin: 'http://localhost:5173', // 设置允许的前端来源
       "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
       "preflightContinue": false,
       "optionsSuccessStatus": 200,
       "credentials": true,
-      allowedHeaders: '*', // 允许所有的请求头
+      allowedHeaders: ['Content-Type', 'Authorization'], // 明确列出允许的头部
       exposedHeaders: '*', // 允许所有的响应头
 
     });

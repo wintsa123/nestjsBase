@@ -3,7 +3,7 @@
     <div class="login-card">
       <div class="sm:mx-auto sm:w-full sm:max-w-sm">
         <!-- 图片居中 -->
-        <img class="mx-auto h-auto w-1/2" src="@/assets/logo.svg" alt="Your Company" style="margin: 0 auto;">
+        <img class="mx-auto h-auto" src="@/assets/logo.svg" alt="Your Company" style="margin: 0 auto; width: 8rem;">
 
         <!-- 标题在图片下方 -->
         <h2 class="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">登录您的帐户</h2>

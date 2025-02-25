@@ -19,18 +19,18 @@ export class AuthController {
     description: '用户名和密码用于用户登录',
     type: user,  // 指定请求体结构
   })
-  async login(@Req() req: Request | any, @Res({ passthrough: true }) res) {
-    const { token, info, refresh_token } =   await  this.authService.login(req.user);
+  async login(@Req() req: Request | any, @Res({ passthrough: true }) _res) {
+    const { token, info, refresh_token } = await this.authService.login(req.user);
 
-    res.setCookie('refresh_token', refresh_token, {
-      httpOnly: true,
-      secure: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: 'none',
-      // domain: 'your-backend-domain.com',
-      path: '/user/refresh',
-    });
-    return({ token, info }) ;
+    // _res.setCookie('refresh_token', refresh_token, {
+    //   httpOnly: false,
+    //   secure: false,
+    //   maxAge: 7 * 24 * 60 * 60 * 1000,
+    //   sameSite: 'none',
+    //   domain: 'localhost:5173',
+    //   path: '/',
+    // });
+    return ({ token, info,refresh_token });
   }
 
   @Public() // 跳过控制器级别的验证
@@ -44,8 +44,12 @@ export class AuthController {
 
   @Public() // 跳过控制器级别的验证
   @Post('refresh')
-  async refresh(@Body() data: {refreshToken:string}) {
-     return this.authService.refresh(data.refreshToken);
+  async refresh(@Req() request: any) {
+    const cookies = request.cookies; // 获取所有 Cookie
+    console.log(cookies)
+    const refreshTokenFromCookie = cookies['refreshToken']; // 获取指定的 Cookie（假设你用的是 `refreshToken` 作为 Cookie 的键名）
+    console.log(refreshTokenFromCookie)
+    return this.authService.refresh(refreshTokenFromCookie);
   }
   @Post('test')
   @ApiBearerAuth('JWT-auth') // 与 main.ts 中定义的安全方案名称一致

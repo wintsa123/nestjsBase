@@ -9,8 +9,13 @@ export class TransformInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
     // 默认状态码设置为 200
-    // response.statusCode = 200;
+    if (request.method === 'POST') {
+      if (response.statusCode === 201) {
+        response.statusCode = 200;
 
+      }
+
+    }
     // 获取请求的 URL 和方法
     const url = request.url;
     const method = request.method;
