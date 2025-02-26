@@ -21,7 +21,7 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
       localStorage.setItem('refresh_token', data.data.refresh_token);
       console.log(data.data.refresh_token)
       localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
-      location.href = '/admin';
+      location.href = '/dashboard';
 
     } else {
       console.log(data)
