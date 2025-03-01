@@ -5,7 +5,7 @@ import { PrismaService } from '@src/plugin/prisma/prisma.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(    private pgService: PrismaService,
+  constructor(private pgService: PrismaService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -17,6 +17,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any) {
     const { key, sub } = payload;
     const user = await this.pgService.user.findUnique({
+      select: {
+        realname: true,
+        role: true,
+        phone: true,
+        email: true,
+        sex: true,
+        lat:true,
+        lng:true,
+        address:true
+
+      },
       where: { id: sub },  // 根据 sub（用户 ID）查询用户
     });
 
@@ -36,6 +47,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!isValid) {
       throw new Error('Invalid key');
     }
-    return { userId: sub, key: key };
+    return { userId: sub, key: key, ...user };
   }
 }

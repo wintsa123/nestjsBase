@@ -1,4 +1,4 @@
-import { UseInterceptors, Controller, Post, Body, UseGuards, Request, ClassSerializerInterceptor, Req, Res } from '@nestjs/common';
+import { UseInterceptors, Controller, Post, Body, UseGuards, Request, ClassSerializerInterceptor, Req, Res, Get } from '@nestjs/common';
 import { userService } from './user.service';
 import { user } from './dto/user.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -63,5 +63,16 @@ export class AuthController {
   ) {
     const user = req.user;
     return this.authService.logout(user);
+  }
+  @Get('userInfo')
+  @ApiBearerAuth('JWT-auth') // 与 main.ts 中定义的安全方案名称一致
+  async userInfo(
+    @Req() req: Request | any
+  ) {
+    if (!req.user) {
+      throw '请先登录'
+    }
+    const { userId,key, ...userWithoutPassword } = req.user;
+    return {  ...userWithoutPassword };
   }
 }

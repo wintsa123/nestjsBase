@@ -8,6 +8,11 @@ export const refreshToken: any = (data:{refreshToken: string}) => {
     return method;
 };
 
+export const userInfo: any = () => {
+    const method = alovaInstance.Get('/user/userInfo');
+   
+    return method;
+};
 export const login = (data: {phone?: number, password: string, email?: string}) => {
     const method = alovaInstance.Post('/user/login',data);
     method.meta = {

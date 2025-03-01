@@ -89,7 +89,7 @@ export class userService {
 
     return {
       token: accessToken,
-      info: { realname: user.realname, role: user.role ,phone: user.phone, email: user.email },
+      // info: { realname: user.realname, role: user.role ,phone: user.phone, email: user.email },
       refresh_token: refreshToken,
       tokenExpireTime: now + 3600
     };

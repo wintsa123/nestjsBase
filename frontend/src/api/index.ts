@@ -62,6 +62,7 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
      
 
       } catch (error) {
+        console.log(error)
         // token刷新失败，跳转回登录页
         location.href = '/login';
         // 并抛出错误
@@ -81,5 +82,7 @@ export const alovaInstance = createAlova({
   responded: onResponseRefreshToken( (response, method) => {
     //...原响应成功拦截器
     return  response.json();
-  })
+  }),
+  // timeout: 10000
+
 });

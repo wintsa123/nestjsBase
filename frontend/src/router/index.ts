@@ -89,8 +89,6 @@ router.beforeEach(async (to: any, _from: any, next: any) => {
     } else {
       // 检查 Access Token 是否过期
       const tokenExpireTime = localStorage.getItem('tokenExpireTime');
-      // return true
-
       if (!tokenExpireTime || parseInt(tokenExpireTime) < Math.floor(Date.now() / 1000)) {
         try {
           // 使用 Refresh Token 获取新的 Access Token
