@@ -8,5 +8,5 @@
 import { useUserStore } from '@/stores/user';
 
 const userStore = useUserStore()
-userStore.SetUserInfo()
+userStore.getUserInfo()
 </script>

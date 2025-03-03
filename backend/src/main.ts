@@ -31,7 +31,7 @@ async function bootstrap() {
       "preflightContinue": false,
       "optionsSuccessStatus": 200,
       "credentials": true,
-      allowedHeaders: ['Content-Type', 'Authorization'], // 明确列出允许的头部
+      allowedHeaders: '*', // 明确列出允许的头部
       exposedHeaders: '*', // 允许所有的响应头
 
     });

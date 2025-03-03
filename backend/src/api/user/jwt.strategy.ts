@@ -23,9 +23,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         phone: true,
         email: true,
         sex: true,
-        lat:true,
-        lng:true,
-        address:true
+        lat: true,
+        lng: true,
+        address: true
 
       },
       where: { id: sub },  // 根据 sub（用户 ID）查询用户
@@ -35,7 +35,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new Error('User not found');
     }
     let isValid = false;
-
 
     if (key.startsWith('phone:')) {
       const phone = key.replace('phone:', '');
@@ -47,6 +46,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!isValid) {
       throw new Error('Invalid key');
     }
-    return { userId: sub, key: key, ...user };
+    const userInfo={ userId: sub, key: key, ...user }
+
+    return userInfo;
   }
 }

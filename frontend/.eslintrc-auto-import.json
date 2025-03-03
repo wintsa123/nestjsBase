@@ -86,6 +86,7 @@
     "useReguest": true,
     "useWatcher": true,
     "useRequest": true,
-    "useMenuStore": true
+    "useMenuStore": true,
+    "useUserStore": true
   }
 }

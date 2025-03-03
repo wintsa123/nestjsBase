@@ -72,7 +72,7 @@ export class AuthController {
     if (!req.user) {
       throw '请先登录'
     }
-    const { userId,key, ...userWithoutPassword } = req.user;
-    return {  ...userWithoutPassword };
+    const { userId, key, ...userWithoutPassword } = req.user;
+    return { ...userWithoutPassword };
   }
 }

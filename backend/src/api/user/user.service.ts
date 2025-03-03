@@ -71,7 +71,10 @@ export class userService {
       sub: user.id, key: user.phone ? `phone:${user.phone}` : `email:${user.email}`
     };
     const accessToken = this.jwtService.sign(TokenPayload);
-
+ 
+    if (!user) {
+      throw new Error('User not found');
+    }
     // 生成 refresh_token
     const redisKey = `user:${user.id}:version`; // Redis key 为 用户 ID + 版本号
     const refreshPayload = { sub: user.id, version: 1 };
@@ -184,24 +187,33 @@ export class userService {
 
     // 验证 refresh_token 是否有效
     let payload;
+    let userInfo
     try {
       payload = this.jwtService.verify(refreshToken, { secret: process.env.JWT_refreshSECRET || 'wintsa_refresh' });
+       userInfo = await this.pgService.user.findUnique({
+        select: {      
+          phone: true,
+          email: true,
+        },
+        where: { id: payload.sub },  // 根据 sub（用户 ID）查询用户
+      });
+  
     } catch (error) {
       console.log(error, 'error')
 
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-
     const { sub: userId, version } = payload;
 
     // 获取 Redis 中的用户版本号
     const redisKey = `user:${userId}:version`; // Redis key 为 用户 ID + 版本号
     const storedVersion = await this.redisService.get(redisKey);
-    if (storedVersion && storedVersion !== version) {
+    if (storedVersion && storedVersion < version 
+    ) {
       throw new UnauthorizedException('Refresh token version mismatch');
     }
-    const newPayload = { sub: userId, key: payload.key };
+    const newPayload = { sub: userId, key: !!userInfo.phone  ? `phone:${userInfo.phone}` : `email:${userInfo.email}` };
     const accessToken = await this.jwtService.sign(newPayload);
 
     const newVersion = version + 1;  // 增加版本号
