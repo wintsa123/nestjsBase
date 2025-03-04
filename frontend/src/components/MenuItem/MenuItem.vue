@@ -7,12 +7,15 @@
     <menu-item v-for="child in item.children" :key="child.path" :item="child" />
   </el-sub-menu>
   <el-menu-item v-else :index="item.path">
-    <el-icon><item.icon /></el-icon>
+    <el-icon>          <component :is="item.icon" v-if="item.icon" />
+    </el-icon>
     <span>{{ item.name }}</span>
   </el-menu-item>
 </template>
 
 <script setup>
+import { markRaw } from 'vue';
+
 defineProps({
   item: {
     type: Object,

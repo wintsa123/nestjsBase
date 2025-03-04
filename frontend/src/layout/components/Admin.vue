@@ -68,6 +68,7 @@ import MenuItem from '@/components/MenuItem/MenuItem.vue'; // 引入递归组件
 import CollapseButtonR from '@/components/CollapseButton/CollapseButtonR.vue'; // 引入递归组件
 import CollapseButtonL from '@/components/CollapseButton/CollapseButtonL.vue'; // 引入递归组件
 import IconAvator from '@/components/IconAvator/IconAvator.vue'; // 引入递归组件
+import { storeToRefs } from 'pinia';
 
 // 获取当前路由
 const route = useRoute();
@@ -79,8 +80,7 @@ const handleClose = (key, keyPath) => {
 }
 // 获取 Pinia Store 中的菜单数据
 const menuStore = useMenuStore();
-const { menuItems, isCollapse } = toRefs(menuStore);
-
+const { menuItems, isCollapse } = storeToRefs(menuStore);
 // 动态设置当前激活的菜单项
 const activeMenu = computed(() => route.path);
 const isRender = ref(isCollapse.value);    // 控制是否渲染 h2
@@ -97,6 +97,7 @@ watch(isCollapse, (newVal) => {
 // 在组件挂载时生成菜单
 onMounted(() => {
   menuStore.generateMenuFromRoutes();
+
 });
 </script>
 
