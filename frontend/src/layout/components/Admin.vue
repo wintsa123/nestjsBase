@@ -84,7 +84,6 @@ const { menuItems, isCollapse } = toRefs(menuStore);
 // 动态设置当前激活的菜单项
 const activeMenu = computed(() => route.path);
 const isRender = ref(isCollapse.value);    // 控制是否渲染 h2
-console.log(isRender)
 watch(isCollapse, (newVal) => {
   if (newVal) {
     setTimeout(() => {
@@ -98,7 +97,6 @@ watch(isCollapse, (newVal) => {
 // 在组件挂载时生成菜单
 onMounted(() => {
   menuStore.generateMenuFromRoutes();
-  console.log(menuItems);
 });
 </script>
 

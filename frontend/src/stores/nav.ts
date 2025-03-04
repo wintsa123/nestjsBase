@@ -11,7 +11,6 @@ export const useMenuStore = defineStore('menu', {
     generateMenuFromRoutes() {
       const routes = router.getRoutes(); // 获取所有路由配置
       this.menuItems = this.filterNavRoutes(routes);
-      console.log(this.menuItems,'1');
     },
     // 递归过滤出需要显示在导航菜单中的路由
     filterNavRoutes(routes:any, parentPath = '') {

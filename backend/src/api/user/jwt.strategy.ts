@@ -25,7 +25,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         sex: true,
         lat: true,
         lng: true,
-        address: true
+        address: true,
+        avator: true
 
       },
       where: { id: sub },  // 根据 sub（用户 ID）查询用户

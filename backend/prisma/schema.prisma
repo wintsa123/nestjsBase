@@ -16,6 +16,7 @@ model Profile {
 
 model User {
   id        Int       @id @default(autoincrement())
+  avator    String?
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
@@ -28,8 +29,8 @@ model User {
   role      Role      @default(USER)
   address   String?
   profile   Profile?
-lat   Float?
-lng   Float?
+  lat   Float?
+  lng   Float?
   @@map("users")
 }
 
