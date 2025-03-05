@@ -57,11 +57,11 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
           localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
         } else {
           ElMessage.error(data.message||data.params.message)
+          throw data
         }
      
 
       } catch (error) {
-        console.log(error)
         // token刷新失败，跳转回登录页
         location.href = '/login';
         // 并抛出错误
@@ -78,9 +78,14 @@ export const alovaInstance = createAlova({
   beforeRequest: onAuthRequired(method => {
     // ...原请求前拦截器
   }),
-  responded: onResponseRefreshToken( (response, method) => {
+  responded: onResponseRefreshToken(async  (response, method) => {
     //...原响应成功拦截器
-    return  response.json();
+    const result= await response.json();
+    if (result.code!=0) {
+      ElMessage.error(result.message||result.params.message)
+      throw result
+    }
+    return result.data
   }),
   // timeout: 10000
 
