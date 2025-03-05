@@ -45,8 +45,17 @@
       <el-scrollbar max-height="100vh" style="width: 100%;">
 
         <el-header style="text-align: right ;  padding: 1rem  
-">
-          <IconAvator />
+"> <el-dropdown>
+                      <IconAvator />
+
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item>View</el-dropdown-item>
+                <el-dropdown-item>Add</el-dropdown-item>
+                <el-dropdown-item>Delete</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </el-header>
         <!-- 主内容区域 -->
         <el-main style="  overflow: hidden; /* 允许滚动 */
