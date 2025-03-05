@@ -9,7 +9,12 @@ export const refreshToken: any = (data:{refreshToken: string}) => {
 };
 
 export const userInfo: any = () => {
-    const method = alovaInstance.Get('/user/userInfo');
+    const method = alovaInstance.Get('/user/userInfo',{ cacheFor: {
+        // 设置缓存模式为持久化模式
+        mode: 'restore',
+        // 缓存时间
+        expire: 60 * 10 * 1000
+      }});
    
     return method;
 };

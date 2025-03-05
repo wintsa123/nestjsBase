@@ -16,7 +16,6 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
     if (data.code==0) {
 
       ElMessage.success(data.message)
-      localStorage.setItem('userInfo', JSON.stringify(data.data.info));
       localStorage.setItem('token', data.data.token);
       localStorage.setItem('refresh_token', data.data.refresh_token);
       console.log(data.data.refresh_token)
