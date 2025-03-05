@@ -8,25 +8,20 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
   typeof VueHook
 >({
   assignToken: method => {
-    method.config.headers.Authorization = 'Bearer '+localStorage.getItem('token');
+    method.config.headers.Authorization = 'Bearer ' + localStorage.getItem('token');
   },
   async login(response: any, method) {
-    const data =  await response.clone().json()   
- 
-    if (data.code==0) {
+    const data = await response.clone().json()
 
-      ElMessage.success(data.message)
-      localStorage.setItem('token', data.data.token);
-      localStorage.setItem('refresh_token', data.data.refresh_token);
-      console.log(data.data.refresh_token)
-      localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
-      location.href = '/dashboard';
 
-    } else {
-      console.log(data)
-      ElMessage.error(data.message||data.params.message)
-    }
- 
+    ElMessage.success(data.message)
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('refresh_token', data.refresh_token);
+    localStorage.setItem('tokenExpireTime', data.tokenExpireTime);
+    location.href = '/dashboard';
+
+
+
 
   },
   logout(response, method) {
@@ -39,8 +34,8 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
   refreshToken: {
     // 在请求前触发，将接收到method参数，并返回boolean表示token是否过期
     isExpired: method => {
-    
-      
+
+
       const tokenExpireTime = localStorage.getItem('tokenExpireTime');
       if (!tokenExpireTime) return true;
       // return true
@@ -50,16 +45,12 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
     // 当token过期时触发，在此函数中触发刷新token
     handler: async method => {
       try {
-        const  data = await refreshToken({ refreshToken: localStorage.getItem('refresh_token') });
-        if (data.code==0) {
-          localStorage.setItem('token', data.data.token);
-          localStorage.setItem('refresh_token', data.data.refresh_token);
-          localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
-        } else {
-          ElMessage.error(data.message||data.params.message)
-          throw data
-        }
-     
+        const data = await refreshToken({ refreshToken: localStorage.getItem('refresh_token') });
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('refresh_token', data.refresh_token);
+        localStorage.setItem('tokenExpireTime', data.tokenExpireTime);
+
+
 
       } catch (error) {
         // token刷新失败，跳转回登录页
@@ -78,11 +69,11 @@ export const alovaInstance = createAlova({
   beforeRequest: onAuthRequired(method => {
     // ...原请求前拦截器
   }),
-  responded: onResponseRefreshToken(async  (response, method) => {
+  responded: onResponseRefreshToken(async (response, method) => {
     //...原响应成功拦截器
-    const result= await response.json();
-    if (result.code!=0) {
-      ElMessage.error(result.message||result.params.message)
+    const result = await response.json();
+    if (result.code != 0) {
+      ElMessage.error(result.message || result.params.message)
       throw result
     }
     return result.data
