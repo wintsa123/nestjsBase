@@ -15,7 +15,8 @@ export const userInfo: any = () => {
         mode: 'restore',
         // 缓存时间
         expire: Infinity
-      }
+      },
+      
     });
    
     return method;

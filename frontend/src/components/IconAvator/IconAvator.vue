@@ -23,9 +23,9 @@ const { data, onSuccess,loading } = useRequest(userInfo, {
     const storedData = localStorage.getItem('userInfo');
     return JSON.parse(storedData || `{"avator":null,"realname":""}`);
 
-    // 也使用alova的level2存储适配器
-    // return alovaInst.l2cache.get('placeholder-data');
+   
   }
+
 
 }).onSuccess(({ data, method })=>{
     localStorage.setItem('userInfo', JSON.stringify(data));

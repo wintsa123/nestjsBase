@@ -15,9 +15,9 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
 
 
     ElMessage.success(data.message)
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('refresh_token', data.refresh_token);
-    localStorage.setItem('tokenExpireTime', data.tokenExpireTime);
+    localStorage.setItem('token', data.data.token);
+    localStorage.setItem('refresh_token', data.data.refresh_token);
+    localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
     location.href = '/dashboard';
 
 
@@ -46,9 +46,9 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
     handler: async method => {
       try {
         const data = await refreshToken({ refreshToken: localStorage.getItem('refresh_token') });
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('refresh_token', data.refresh_token);
-        localStorage.setItem('tokenExpireTime', data.tokenExpireTime);
+        localStorage.setItem('token', data.data.token);
+        localStorage.setItem('refresh_token', data.data.refresh_token);
+        localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
 
 
 
@@ -71,12 +71,18 @@ export const alovaInstance = createAlova({
   }),
   responded: onResponseRefreshToken(async (response, method) => {
     //...原响应成功拦截器
+
     const result = await response.json();
-    if (result.code != 0) {
-      ElMessage.error(result.message || result.params.message)
-      throw result
+    if (!!method.meta && !!method.meta.diy) {
+      return result
+    } else {
+      if (result.code != 0) {
+        ElMessage.error(result.message || result.params.message)
+        throw result
+      }
+      return result.data
     }
-    return result.data
+
   }),
   // timeout: 10000
 
