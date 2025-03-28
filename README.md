@@ -60,9 +60,10 @@
 ## 快速开始
 
 ### 环境要求
-- Node.js (推荐版本 >= 16.x)
+- Node.js (推荐版本 >= 20.x)
 - PostgreSQL
-- pnpm或者yarn
+- pnpm
+- redis
 
 ### 安装步骤
 1. **克隆仓库**
