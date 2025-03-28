@@ -20,7 +20,8 @@ async function bootstrap() {
   try {
     const logger: Logger = new Logger('main.ts');
     const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({
-      logger: true, bodyLimit: 10485760, // 设置请求正文大小限制为 10MB (单位为字节)
+     logger: true,
+      bodyLimit: 10485760, // 设置请求正文大小限制为 10MB (单位为字节)
     }), {
       logger: IS_DEV ? ['log', 'debug', 'error', 'warn'] : ['error', 'warn', 'debug'],
     });
