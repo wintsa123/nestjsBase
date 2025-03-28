@@ -17,6 +17,7 @@ import { SocketModule } from './socket/socket.module';
 import { CronModule } from './corn/rebot.module';
 import { JwtAuthGuard } from './guard/jwt-auth.guard';
 import { TransformInterceptor } from './interceptors/transfrom';
+// import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -27,7 +28,10 @@ import { TransformInterceptor } from './interceptors/transfrom';
     }),
     // mysql的连接
   
-
+    // ServeStaticModule.forRoot({
+    //   rootPath: join(__dirname, '..', 'public'), // 指定静态文件目录
+    //   exclude: ['/api*'], // 排除 API 路由
+    // }),
     CronModule,
     ApiModule,
     PluginModule,
