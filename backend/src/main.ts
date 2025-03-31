@@ -6,7 +6,6 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { join } from 'path';
 import { fastifyHelmet } from '@fastify/helmet';
-import { fastifyStatic } from '@fastify/static';
 import * as fastifyXmlBody from 'fastify-xml-body-parser';
 import fastifyMultipart from '@fastify/multipart';
 
