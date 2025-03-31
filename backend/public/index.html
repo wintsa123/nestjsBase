@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后端项目文档 - NestJS + Fastify</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+        }
+        .nav-brand {
+            font-weight: 600;
+            color: #2c3e50 !important;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: Monaco, Consolas, "Courier New", monospace;
+        }
+        .endpoint-method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        .get-method { background-color: #e8f5e9; color: #2e7d32; }
+        .post-method { background-color: #fff3e0; color: #ef6c00; }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand nav-brand" href="#">🔗 API Server</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 项目简介 -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title mb-3">📖 项目概述</h2>
+                <p class="card-text">
+                    基于 NestJS 11 + Fastify 构建的高性能后端服务，采用模块化架构设计，支持：
+                </p>
+                <div class="d-flex gap-2 mb-3">
+                    <span class="badge bg-primary">RESTful API</span>
+                    <span class="badge bg-success">JWT 认证</span>
+                    <span class="badge bg-info"><a href="/api">Swagger 文档</a></span>
+                    <span class="badge bg-warning">PostgreSQL</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主要功能 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title mb-3">🚀 核心功能</h4>
+                        <ul>
+                            <li>用户认证系统 (JWT)</li>
+                            <li>数据验证管道</li>
+                            <li>请求速率限制</li>
+                            <li>数据库事务管理</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 技术栈 -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title mb-3">🛠️ 技术栈</h4>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge bg-dark">NestJS 11</span>
+                            <span class="badge bg-secondary">Fastify</span>
+                            <span class="badge bg-primary">TypeScript</span>
+                            <span class="badge bg-info">prisma</span>
+                            <span class="badge bg-success">PostgreSQL</span>
+                            <span class="badge bg-warning">Redis</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API 示例 -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="card-title mb-3">🌐 API 示例</h4>
+                <div class="mb-3">
+                    <span class="endpoint-method get-method">GET</span>
+                    <code>/api/v1/items</code>
+                    <span class="text-muted ms-2">获取所有项目</span>
+                </div>
+                <div class="mb-3">
+                    <span class="endpoint-method post-method">POST</span>
+                    <code>/api/v1/items</code>
+                    <span class="text-muted ms-2">创建新项目</span>
+                </div>
+                <pre class="code-block">// 请求示例
+fetch('/api/v1/items', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer your_token'
+  },
+  body: JSON.stringify({
+    name: "New Item",
+    description: "Sample description"
+  })
+})</pre>
+            </div>
+        </div>
+
+        <!-- 部署说明 -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="card-title mb-3">⚙️ 快速开始</h4>
+                <h5>安装依赖</h5>
+                <pre class="code-block">npm install
+npm run build
+npm run start:prod</pre>
+                
+                <h5 class="mt-4">环境配置</h5>
+                <pre class="code-block"># .env 文件示例
+DATABASE_URL=postgresql://user:password@localhost:5432/db
+JWT_SECRET=your_secret_key
+REDIS_HOST=localhost</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white mt-4">
+        <div class="container py-4">
+            <div class="text-center">
+                <p class="mb-0">© 2024 API Server Project. MIT License</p>
+                <p class="mb-0">Powered by NestJS & Fastify</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

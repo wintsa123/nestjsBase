@@ -44,10 +44,8 @@ async function bootstrap() {
     app.enableVersioning(Version as VersioningOptions);
 
     SetMetadata('Version', Version)(AppModule);
-    app.register(fastifyStatic, {
-      root: join(__dirname, 'public'),
-      prefix: '/', // optional: default '/'
-    })
+  
+
     app.register(fastifyXmlBody);
     app.register(fastifyMultipart, {
       limits: {
