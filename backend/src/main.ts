@@ -25,7 +25,7 @@ async function bootstrap() {
     }), {
       logger: IS_DEV ? ['log', 'debug', 'error', 'warn'] : ['error', 'warn', 'debug'],
     });
-    app.enableCors({
+   await app.enableCors({
       "origin": "*",
       // origin: 'http://localhost:5173', // 设置允许的前端来源
       "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
@@ -41,13 +41,13 @@ async function bootstrap() {
       defaultVersion: '1', // 不指定默认版本为v1
       type: VersioningType.URI,
     }
-    app.enableVersioning(Version as VersioningOptions);
+    await app.enableVersioning(Version as VersioningOptions);
 
     SetMetadata('Version', Version)(AppModule);
   
 
-    app.register(fastifyXmlBody);
-    app.register(fastifyMultipart, {
+    await   app.register(fastifyXmlBody);
+    await  app.register(fastifyMultipart, {
       limits: {
         fieldNameSize: 100, // Max field name size in bytes
         fieldSize: 100,     // Max field value size in bytes
@@ -58,12 +58,12 @@ async function bootstrap() {
         parts: 1000         // For multipart forms, the max number of parts (fields + files)
       },
     });
-    app.register(fastifyCookie, {
+    await  app.register(fastifyCookie, {
       secret: 'wintsa', // for cookies signature
     });
-    app.register(fastifyCsrf);
+    await app.register(fastifyCsrf);
 
-    app.register(
+    await app.register(
       fastifyHelmet,
       {
         contentSecurityPolicy: false,
