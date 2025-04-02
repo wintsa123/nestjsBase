@@ -21,13 +21,14 @@ const { data, onSuccess,loading } = useRequest(userInfo, {
     initialData() {
     // 设置上一次的响应数据
     const storedData = localStorage.getItem('userInfo');
-    return JSON.parse(storedData || `{"avator":null,"realname":""}`);
+    return JSON.parse(storedData ==''|| `{"avator":null,"realname":""}`);
 
    
   }
 
 
 }).onSuccess(({ data, method })=>{
+    console.log(data,'userInfo')
     localStorage.setItem('userInfo', JSON.stringify(data));
 
 })
