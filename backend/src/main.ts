@@ -4,10 +4,10 @@ import { AppModule } from './app.module';
 import { getConfig, IS_DEV } from './utils';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { join } from 'path';
 import { fastifyHelmet } from '@fastify/helmet';
 import * as fastifyXmlBody from 'fastify-xml-body-parser';
 import fastifyMultipart from '@fastify/multipart';
+declare const module: any;
 
 import fastifyCsrf from '@fastify/csrf-protection';
 import { fastifyCookie } from '@fastify/cookie';
@@ -18,6 +18,7 @@ const PREFIX = config.PREFIX || '/';
 async function bootstrap() {
   try {
     const logger: Logger = new Logger('main.ts');
+    
     const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter({
      logger: true,
       bodyLimit: 10485760, // 设置请求正文大小限制为 10MB (单位为字节)
@@ -97,7 +98,11 @@ async function bootstrap() {
 
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup('api', app, document);
-
+    if (module.hot) {
+      module.hot.accept();
+      module.hot.dispose(() => app.close());
+    }
+    
     await app.listen(PORT, '0.0.0.0', () => {
       logger.log(`服务已经启动,接口请访问:http://127.0.0.1:${PORT}/${PREFIX}`);
     });

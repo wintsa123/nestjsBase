@@ -17,6 +17,8 @@
     "esModuleInterop": true,
     // 相当于下面两个检查noImplicitAny、strictNullChecks
     "strict": true,
+    "moduleResolution": "node",
+
     "noImplicitAny": false /*不能有any类型*/,
     "noImplicitThis": true,
     "noUnusedLocals": false /*定义未使用的时候会有提示*/,

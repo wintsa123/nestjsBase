@@ -6,12 +6,12 @@ import { RouterModule } from '@nestjs/core';
 @Module({
   imports: [
    
-    RouterModule.register([
-      {
-        path: '', // 指定项目名称
-        module: TmpRedisModule,
-      },
-    ]),
+    // RouterModule.register([
+    //   {
+    //     path: '', // 指定项目名称
+    //     module: TmpRedisModule,
+    //   },
+    // ]),
 
   ],
   controllers: [TmpRedisController],
