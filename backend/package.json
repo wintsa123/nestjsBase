@@ -106,7 +106,7 @@
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "cz-customizable": "^7.4.0",
-    "eslint": "^8.57.1",
+    "eslint": "^9.23.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.5",
     "jest": "^29.7.0",
@@ -121,6 +121,11 @@
     "typescript": "^5.8.2",
     "webpack": "^5.98.0",
     "webpack-node-externals": "^3.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "bcrypt"
+    ]
   },
   "jest": {
     "moduleFileExtensions": [
@@ -154,4 +159,5 @@
   "gitHooks": {
     "pre-commit": "lint-staged"
   }
+  
 }
