@@ -11,7 +11,7 @@ export const refreshToken: any = (data:{refreshToken: string}) => {
 export const userInfo: any = () => {
     const method = alovaInstance.Get('/user/userInfo',{
          cacheFor: {
-        // 设置缓存模式为持久化模式
+        // 设置缓存模式为持久化模式,增删改查的时候需要触发钩子清空缓存
         mode: 'restore',
         // 缓存时间
         expire: Infinity

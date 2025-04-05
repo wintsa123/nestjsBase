@@ -45,14 +45,40 @@
       <el-scrollbar max-height="100vh" style="width: 100%;">
 
         <el-header style="text-align: right ;  padding: 1rem  
-"> <el-dropdown>
-                      <IconAvator />
+"> <el-dropdown @command="handleCommand">
+            <IconAvator v-once />
 
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item>View</el-dropdown-item>
-                <el-dropdown-item>Add</el-dropdown-item>
-                <el-dropdown-item>Delete</el-dropdown-item>
+                <el-dropdown-item class="user-menu-item">
+                  <!-- 图标缓存优化 -->
+                  <IconAvator class="user-avatar" v-once />
+
+                  <!-- 使用计算属性减少模板逻辑 -->
+                  <div class="user-info">
+                    <div class="role-text">
+                      {{ roleDisplayName }}
+                    </div>
+                    <div class="username-text">
+                      {{ data.realname }}
+                    </div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item icon="User" divided command="user">
+                  <div class="dropdownInfo"> 
+                    <div>个人信息</div>
+                  </div>
+
+
+                </el-dropdown-item>
+                <el-dropdown-item icon="QuestionFilled"  command="help">
+                  <div class="dropdownInfo">
+                 帮助文档 </div></el-dropdown-item>
+                <el-dropdown-item divided command="logout"> <el-button type="danger">退出登录 <el-icon>
+                      <SwitchButton />
+                    </el-icon>
+                  </el-button>
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -78,7 +104,28 @@ import CollapseButtonR from '@/components/CollapseButton/CollapseButtonR.vue'; /
 import CollapseButtonL from '@/components/CollapseButton/CollapseButtonL.vue'; // 引入递归组件
 import IconAvator from '@/components/IconAvator/IconAvator.vue'; // 引入递归组件
 import { storeToRefs } from 'pinia';
+import { logout, userInfo } from "@/api/user/user";
+import { useUserStore } from '@/stores/user';
 
+const { data, onSuccess, loading } = useRequest(userInfo, {
+  initialData() {
+    // 设置上一次的响应数据
+    const storedData = localStorage.getItem('userInfo');
+    return JSON.parse(storedData == '' || `{"avator":null,"realname":""}`);
+
+
+  }
+
+
+}).onSuccess(({ data, method }) => {
+  console.log(data, 'userInfo')
+  localStorage.setItem('userInfo', JSON.stringify(data));
+
+})
+// 计算属性优化
+const roleDisplayName = computed(() =>
+  data.role === 'ADMIN' ? '一家之主' : '用户'
+)
 // 获取当前路由
 const route = useRoute();
 const handleOpen = (key, keyPath) => {
@@ -108,9 +155,76 @@ onMounted(() => {
   menuStore.generateMenuFromRoutes();
 
 });
+
+const handleCommand = async (command) => {
+  switch (command) {
+    case 'user':
+
+      break;
+    case 'help':
+
+      break;
+    case 'logout':
+      await logout()
+      break;
+
+    default:
+      break;
+  }
+}
 </script>
 
 <style scoped>
+.user-menu-item {
+  min-width: 160px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* 现代浏览器间距方案 */
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  /* 防止图标被压缩 */
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+  /* 防止文本溢出 */
+}
+
+.role-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--el-color-primary);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.username-text {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  text-align: center;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .role-text {
+    font-size: 13px;
+  }
+}
+
 .el-aside ul {
   border-right: none;
   background-color: var(--background-color);
@@ -182,5 +296,17 @@ onMounted(() => {
   border-start-start-radius: 0 !important;
   transition: margin-inline .15sease-in-out;
   will-change: margin-inline;
+}
+
+.dropdownInfo {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+:deep(.el-dropdown-menu__item) {
+  padding: 5px 25px ;
+
 }
 </style>

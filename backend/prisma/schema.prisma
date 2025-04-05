@@ -26,7 +26,7 @@ model User {
   email     String?   @unique
   age       Int?
   sex       Int?
-  role      Role      @default(USER)
+  role      Role      @default(ADMIN)
   address   String?
   profile   Profile?
   lat   Float?
