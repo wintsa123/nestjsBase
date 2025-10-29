@@ -83,6 +83,7 @@ router.beforeEach(async (to: any, _from: any, next: any) => {
   const refreshToken = localStorage.getItem('refreshToken'); // 获取 Refresh Token
 
   if (to.meta.requiresAuth) {
+    console.log('requiresAuth', to.meta.requiresAuth)
     if (!accessToken) {
       // 如果没有 Access Token，跳转到登录页
       next('/login');

@@ -16,7 +16,7 @@
                 <transition name="fade">
 
                   <h2 :class="{ 'fade-in': !isRender }" class="  font-bold text-xl m-0" v-if="isRender">
-                    电子族谱
+                    众为Ai文档
                   </h2>
                 </transition>
               </div>
