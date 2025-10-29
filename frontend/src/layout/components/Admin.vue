@@ -44,8 +44,14 @@
     <el-container>
       <el-scrollbar max-height="100vh" style="width: 100%;">
 
-        <el-header style="text-align: right ;  padding: 1rem  
-"> <el-dropdown @command="handleCommand">
+        <el-header style=" padding: 1rem  
+">
+  <el-space wrap :size="5">
+
+          <el-button :icon="Search" size="large" circle />
+
+
+          <el-dropdown @command="handleCommand">
             <IconAvator v-once />
 
             <template #dropdown>
@@ -65,15 +71,16 @@
                   </div>
                 </el-dropdown-item>
                 <el-dropdown-item icon="User" divided command="user">
-                  <div class="dropdownInfo"> 
+                  <div class="dropdownInfo">
                     <div>个人信息</div>
                   </div>
 
 
                 </el-dropdown-item>
-                <el-dropdown-item icon="QuestionFilled"  command="help">
+                <el-dropdown-item icon="QuestionFilled" command="help">
                   <div class="dropdownInfo">
-                 帮助文档 </div></el-dropdown-item>
+                    帮助文档 </div>
+                </el-dropdown-item>
                 <el-dropdown-item divided command="logout"> <el-button type="danger">退出登录 <el-icon>
                       <SwitchButton />
                     </el-icon>
@@ -82,6 +89,8 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown>
+
+          </el-space>
         </el-header>
         <!-- 主内容区域 -->
         <el-main style="  overflow: hidden; /* 允许滚动 */
@@ -306,7 +315,7 @@ const handleCommand = async (command) => {
 }
 
 :deep(.el-dropdown-menu__item) {
-  padding: 5px 25px ;
+  padding: 5px 25px;
 
 }
 </style>

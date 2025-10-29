@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ClientContext, Result } from 'ioredis';
-import { Redis } from '@upstash/redis'
+import { ClientContext, Result,Redis } from 'ioredis';
+// import { Redis } from '@upstash/redis'
 
 import { ObjectType } from '@src/types';
 import { isObject } from '@src/utils';
@@ -15,31 +15,18 @@ export class RedisService {
       this.getClient();
     }
   }
+  // private getClient() {
+  //   this.redisClient = new Redis({
+  //     url: process.env.REDIS_URL ,
+  //     token: process.env.REDIS_PASSWORD ,
+  //   })
+  // }
   private getClient() {
-    this.redisClient = new Redis({
-      url: 'https://vocal-hyena-57342.upstash.io',
-      token: 'Ad_-AAIjcDE1YjZiM2QyNTY2ODQ0NmI0YTFmMTFiZDE1M2Y3M2MwOHAxMA',
-    })
-  }
-  // private getClient() {
-  //   this.redisClient = new Redis({
-  //     port: 6379, // Redis port
-  //     host: 'vocal-hyena-57342.upstash.io', // redisDb Redis host
-  //     username: '', // needs Redis >= 6
-  //     password: 'Ad_-AAIjcDE1YjZiM2QyNTY2ODQ0NmI0YTFmMTFiZDE1M2Y3M2MwOHAxMA', // 密码
-  //     db: 0, // redis是几个数据库的，使用第一个
+    this.redisClient = new Redis(process.env.REDIS_URL as string);
 
-  //   });
-  // }
-  // private getClient() {
-  //   this.redisClient = new Redis({
-  //     port: 6388, // Redis port
-  //     host: '192.168.2.221', // redisDb Redis host
-  //     username: '', // needs Redis >= 6
-  //     password: '12300114', // 密码
-  //     db: 0, // redis是几个数据库的，使用第一个
-  //   });
-  // }
+  
+  }
+
   /**
    * @Author: 水痕
    * @Date: 2022-08-11 11:25:54
@@ -61,8 +48,8 @@ export class RedisService {
     if (!second) {
       return await this.redisClient.set(key, value);
     } else {
-      // return await this.redisClient.set(key, value, 'EX', second);
-      return await this.redisClient.set(key, value, { ex: second });
+      return await this.redisClient.set(key, value, 'EX', second);
+      // return await this.redisClient.set(key, value, { ex: second });
 
     }
   }
