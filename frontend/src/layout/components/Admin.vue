@@ -46,49 +46,49 @@
 
         <el-header style=" padding: 1rem  
 ">
-  <el-space wrap :size="5">
+          <el-space wrap :size="5">
 
-          <el-button :icon="Search" size="large" circle />
+            <el-button :icon="Search" size="large" circle />
 
 
-          <el-dropdown @command="handleCommand">
-            <IconAvator v-once />
+            <el-dropdown @command="handleCommand">
+              <IconAvator v-once />
 
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item class="user-menu-item">
-                  <!-- 图标缓存优化 -->
-                  <IconAvator class="user-avatar" v-once />
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item class="user-menu-item">
+                    <!-- 图标缓存优化 -->
+                    <IconAvator class="user-avatar" v-once />
 
-                  <!-- 使用计算属性减少模板逻辑 -->
-                  <div class="user-info">
-                    <div class="role-text">
-                      {{ roleDisplayName }}
+                    <!-- 使用计算属性减少模板逻辑 -->
+                    <div class="user-info">
+                      <div class="role-text">
+                        {{ roleDisplayName }}
+                      </div>
+                      <div class="username-text">
+                        {{ data.realname }}
+                      </div>
                     </div>
-                    <div class="username-text">
-                      {{ data.realname }}
+                  </el-dropdown-item>
+                  <el-dropdown-item icon="User" divided command="user">
+                    <div class="dropdownInfo">
+                      <div>个人信息</div>
                     </div>
-                  </div>
-                </el-dropdown-item>
-                <el-dropdown-item icon="User" divided command="user">
-                  <div class="dropdownInfo">
-                    <div>个人信息</div>
-                  </div>
 
 
-                </el-dropdown-item>
-                <el-dropdown-item icon="QuestionFilled" command="help">
-                  <div class="dropdownInfo">
-                    帮助文档 </div>
-                </el-dropdown-item>
-                <el-dropdown-item divided command="logout"> <el-button type="danger">退出登录 <el-icon>
-                      <SwitchButton />
-                    </el-icon>
-                  </el-button>
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+                  </el-dropdown-item>
+                  <el-dropdown-item icon="QuestionFilled" command="help">
+                    <div class="dropdownInfo">
+                      帮助文档 </div>
+                  </el-dropdown-item>
+                  <el-dropdown-item divided command="logout"> <el-button type="danger">退出登录 <el-icon>
+                        <SwitchButton />
+                      </el-icon>
+                    </el-button>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
 
           </el-space>
         </el-header>

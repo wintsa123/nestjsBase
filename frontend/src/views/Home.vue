@@ -48,7 +48,10 @@
         <el-main style="  overflow: hidden; /* 允许滚动 */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE 和 Edge */">
-          <router-view />
+           <div>
+    <input type="file" @change="handleFileUpload" accept=".pdf,.docx,.doc" />
+    <PdfViewer v-if="pdfUrl" :pdf-url="pdfUrl" />
+  </div>
         </el-main>
       </el-scrollbar>
 
@@ -66,7 +69,16 @@ import CollapseButtonL from '@/components/CollapseButton/CollapseButtonL.vue'; /
 import IconAvator from '@/components/IconAvator/IconAvator.vue'; // 引入递归组件
 import { storeToRefs } from 'pinia';
 
+import PdfViewer from '@/components/PdfView/PdfView.vue'
 
+const pdfUrl = ref('')
+
+const handleFileUpload = (event) => {
+  const file = event.target.files[0]
+  if (file && (file.type === 'application/pdf' || file.type === 'application/msword' || file.type === 'application/vnd.ms-word')) {
+    pdfUrl.value = URL.createObjectURL(file)
+  }
+}
 // 获取 Pinia Store 中的菜单数据
 const menuStore = useMenuStore();
 const { menuItems, isCollapse } = storeToRefs(menuStore);
