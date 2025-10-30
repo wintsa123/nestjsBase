@@ -1,9 +1,20 @@
+// Declare the variable with !default before using it
+$--menu-bg-color: transparent ;
+$--el-card-bg-color: #fafafa;
+$--el-card-shadow: 0 1px 4px rgba(0,0,0,0.1);
 @forward 'element-plus/theme-chalk/src/common/var.scss' with (
   $colors: (
     'primary': (
       'base': rgb(86, 187, 86),
     ),
-  )
+  ),
+   $menu: (
+    'bg-color': $--menu-bg-color,
+  ),
+   $card: (
+    'bg-color': $--el-card-bg-color,
+    'box-shadow': $--el-card-shadow,
+  ),
 );
 
 @use "element-plus/theme-chalk/src/index.scss" as *;

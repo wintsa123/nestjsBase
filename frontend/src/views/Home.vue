@@ -167,7 +167,7 @@ onMounted(() => {
 
 .el-aside ul {
   border-right: none;
-  background-color: var(--background-color);
+  /* background-color: var(--background-color); */
 }
 
 

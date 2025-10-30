@@ -16,46 +16,34 @@
         <div v-if="outline.length === 0 && textBasedHeadings.length === 0" class="no-outline">
           未检测到目录结构
         </div>
-        
+
         <!-- 标准目录 -->
         <div v-if="outline.length > 0" class="outline-list">
-          <div
-            v-for="(item, index) in outline"
-            :key="index"
-            :style="{ paddingLeft: (item.level * 15) + 'px' }"
-            class="outline-item"
-            @click="scrollToPage(item.pageIndex)"
-          >
+          <div v-for="(item, index) in outline" :key="index" :style="{ paddingLeft: (item.level * 15) + 'px' }"
+            class="outline-item" @click="scrollToPage(item.pageIndex)">
+            <span class="item-number">{{ item.number }}</span>
             <span class="item-title">{{ item.title }}</span>
-            <span v-if="item.pageIndex" class="item-page">{{ item.pageIndex }}</span>
+            <span v-if="item.pageIndex" class="item-page">P{{ item.pageIndex }}</span>
           </div>
         </div>
 
         <!-- 显示提取的文本标题 -->
         <div v-if="textBasedHeadings.length > 0" class="text-headings">
           <h4>{{ outline.length > 0 ? '其他标题:' : '检测到的标题:' }}</h4>
-          <div
-            v-for="(heading, index) in textBasedHeadings"
-            :key="'heading-' + index"
-            :style="{ paddingLeft: (heading.level * 15) + 'px' }"
-            class="outline-item"
-            @click="scrollToPage(heading.pageIndex)"
-          >
+          <div v-for="(heading, index) in textBasedHeadings" :key="'heading-' + index"
+            :style="{ paddingLeft: (heading.level * 15) + 'px' }" class="outline-item"
+            @click="scrollToPage(heading.pageIndex)">
+            <span class="item-number" v-if="!hasNumberInTitle(heading.text)">{{ index + 1 }}.</span>
             <span class="item-title">{{ heading.text }}</span>
-            <span class="item-page">{{ heading.pageIndex }}</span>
+            <span class="item-page">P{{ heading.pageIndex }}</span>
           </div>
         </div>
       </div>
 
       <!-- PDF 页面容器 -->
       <div class="pages-container" ref="pagesContainer">
-        <div
-          v-for="pageNum in totalPages"
-          :key="pageNum"
-          :ref="el => setPageRef(el, pageNum)"
-          class="page-wrapper"
-          :data-page="pageNum"
-        >
+        <div v-for="pageNum in totalPages" :key="pageNum" :ref="el => setPageRef(el, pageNum)" class="page-wrapper"
+          :data-page="pageNum">
           <div class="page-number">第 {{ pageNum }} 页</div>
           <canvas :ref="el => setCanvasRef(el, pageNum)"></canvas>
         </div>
@@ -94,6 +82,20 @@ const textBasedHeadings = ref([])
 const showOutline = ref(true)
 let pdfDoc = null
 
+// 检查标题是否已包含序号
+const hasNumberInTitle = (title) => {
+  // 匹配常见的序号格式：1、1.、一、第一章、Chapter 1 等
+  const patterns = [
+    /^\d+[、.．。）)]/,           // 1、 1. 1） 1)
+    /^第?[一二三四五六七八九十百千]+[章节部篇]/,  // 第一章、一章
+    /^[Chapter|Section|Part]\s*\d+/i,  // Chapter 1
+    /^\([一二三四五六七八九十\d+]\)/,  // (一) (1)
+    /^[A-Z][\、.]/,                // A、 A.
+    /^\d+\.\d+/                    // 1.1 1.2.3
+  ]
+  return patterns.some(pattern => pattern.test(title.trim()))
+}
+
 const setCanvasRef = (el, pageNum) => {
   if (el) {
     canvasRefs.value[pageNum] = el
@@ -111,21 +113,18 @@ const extractTOCFromAnnotations = async () => {
   const tocItems = []
   const linksByPage = {}
 
-  console.log('开始扫描页面注释...')
 
   // 扫描前10页或所有页面的注释（目录通常在前面）
   const pagesToScan = Math.min(10, totalPages.value)
-  
+
   for (let pageNum = 1; pageNum <= pagesToScan; pageNum++) {
     try {
       const page = await pdfDoc.getPage(pageNum)
       const annotations = await page.getAnnotations()
 
       if (annotations && annotations.length > 0) {
-        console.log(`第 ${pageNum} 页找到 ${annotations.length} 个注释`)
 
         for (const annotation of annotations) {
-          console.log(`注释类型: ${annotation.subtype}`, annotation)
 
           // 查找 Link 类型的注释
           if (annotation.subtype === 'Link') {
@@ -153,21 +152,21 @@ const extractTOCFromAnnotations = async () => {
               const textContent = await page.getTextContent()
               const rect = annotation.rect
               let foundText = ''
-              
+
               // 查找在链接区域内的文本
               for (const item of textContent.items) {
                 if (item.transform) {
                   const x = item.transform[4]
                   const y = item.transform[5]
-                  
+
                   // 检查文本是否在链接矩形区域内
-                  if (x >= rect[0] - 2 && x <= rect[2] + 2 && 
-                      y >= rect[1] - 2 && y <= rect[3] + 2) {
+                  if (x >= rect[0] - 2 && x <= rect[2] + 2 &&
+                    y >= rect[1] - 2 && y <= rect[3] + 2) {
                     foundText += item.str
                   }
                 }
               }
-              
+
               if (foundText.trim()) {
                 linkText = foundText.trim()
               }
@@ -183,7 +182,6 @@ const extractTOCFromAnnotations = async () => {
                 sourceRect: annotation.rect,
                 annotation: annotation
               })
-              console.log(`找到链接: "${linkText}" -> 第 ${targetPage} 页`)
             }
           }
         }
@@ -193,7 +191,6 @@ const extractTOCFromAnnotations = async () => {
     }
   }
 
-  console.log('所有页面的链接汇总:', linksByPage)
 
   // 查找目录页（通常在前几页，且包含大量链接）
   let tocPageNum = null
@@ -208,26 +205,86 @@ const extractTOCFromAnnotations = async () => {
   }
 
   if (tocPageNum && linksByPage[tocPageNum]) {
-    console.log(`✅ 检测到目录页: 第 ${tocPageNum} 页，共 ${maxLinks} 个链接`)
 
     // 按垂直位置排序链接（从上到下）
     const sortedLinks = linksByPage[tocPageNum].sort((a, b) => {
       return b.sourceRect[3] - a.sourceRect[3] // Y坐标降序
     })
 
+    // 收集所有缩进值并自动分级
+    const indents = sortedLinks.map(link => link.sourceRect[0])
+    const uniqueIndents = [...new Set(indents)].sort((a, b) => a - b)
+
+
+    // 将缩进映射到级别
+    const indentToLevel = {}
+    uniqueIndents.forEach((indent, index) => {
+      indentToLevel[indent] = index
+    })
+
+    // 生成层级序号的计数器
+    const counters = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] // 支持最多10级
+
+    // 生成层级序号
+    const generateNumber = (level) => {
+      // 重置当前级别之后的所有计数器
+      for (let i = level + 1; i < counters.length; i++) {
+        counters[i] = 0
+      }
+
+      // 当前级别计数器+1
+      counters[level]++
+
+      // 生成序号字符串
+      const numbers = []
+      for (let i = 0; i <= level; i++) {
+        if (counters[i] > 0) {
+          numbers.push(counters[i])
+        }
+      }
+
+      return numbers.join('.')
+    }
+
+    // 清理标题文本（移除末尾的页码）
+    const cleanTitle = (text) => {
+      // 移除末尾的页码模式：...123、...p123、... 123等
+      return text.replace(/[\s.．…]+\d+\s*$/, '').trim()
+    }
+    function hasExistingNumber(title) {
+      const startsWithNumber = /^[\d一二三四五六七八九十①②③④⑤⑥⑦⑧⑨⑩⒈⒉⒊⒋⒌⒍⒍⒎⒏⒐⒑第（]/.test(title);
+      if (!startsWithNumber) return false;
+
+      const numberPatterns = [
+        /^\d+(\.\d+)*[\s.、]/,
+        /^[一二三四五六七八九十]+[、.]/,
+        /^第[一二三四五六七八九十\d]+[章节条][\s]/,
+        /^（[一二三四五六七八九十]+）/,
+        /^[①②③④⑤⑥⑦⑧⑨⑩][\s.]/,
+      ];
+
+      return numberPatterns.some(pattern => pattern.test(title));
+    }
+    // 检查标题是否已包含序号
+    const hasNumber = sortedLinks.some(link => hasExistingNumber(cleanTitle(link.text)))
     // 将链接转换为目录项
     for (const link of sortedLinks) {
-      // 尝试检测标题级别（基于缩进）
-      let level = 0
       const indent = link.sourceRect[0]
-      if (indent > 100) level = 2
-      else if (indent > 60) level = 1
+      const level = indentToLevel[indent] || 0
+      const cleanedTitle = cleanTitle(link.text)
+
+      // 检查标题是否已包含序号
+      const number = hasNumber ? '' : generateNumber(level)
 
       tocItems.push({
-        title: link.text,
+        title: cleanedTitle,
+        number: number,
         pageIndex: link.targetPage,
-        level: level
+        level: level,
+        indent: indent
       })
+
+      console.log(`${number ? number + ' ' : ''}${cleanedTitle} (级别${level}, 缩进${indent.toFixed(1)}) -> P${link.targetPage}`)
     }
   } else {
     console.log('❌ 未找到目录页（没有页面包含足够的链接）')
@@ -280,15 +337,12 @@ const extractOutline = async () => {
   if (!pdfDoc) return
 
   try {
-    console.log('========== 开始提取目录 ==========')
-    
+
     // 方法1: 使用 getOutline
     const pdfOutline = await pdfDoc.getOutline()
-    console.log('1. PDF Outline:', pdfOutline)
 
     if (pdfOutline && pdfOutline.length > 0) {
       outline.value = await parseOutline(pdfOutline)
-      console.log('✅ 从 Outline 提取到目录:', outline.value)
       return
     }
 
@@ -389,7 +443,7 @@ const extractHeadingsFromText = async () => {
   }
 
   // 去重相似的标题
-  return headings.filter((heading, index, self) => 
+  return headings.filter((heading, index, self) =>
     index === self.findIndex(h => h.text === heading.text && h.pageIndex === heading.pageIndex)
   )
 }
@@ -397,9 +451,9 @@ const extractHeadingsFromText = async () => {
 // 滚动到指定页面
 const scrollToPage = (pageIndex) => {
   if (pageIndex && pageRefs.value[pageIndex]) {
-    pageRefs.value[pageIndex].scrollIntoView({ 
-      behavior: 'smooth', 
-      block: 'start' 
+    pageRefs.value[pageIndex].scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
     })
   }
 }
@@ -413,7 +467,7 @@ const loadPDF = async () => {
     loadingProgress.value = 0
 
     const loadingTask = pdfjsLib.getDocument(props.pdfUrl)
-    
+
     loadingTask.onProgress = (progress) => {
       if (progress.total > 0) {
         loadingProgress.value = Math.round((progress.loaded / progress.total) * 100)
@@ -587,6 +641,14 @@ onMounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-left: 5px;
+}
+
+.item-number {
+  color: #666;
+  font-weight: 500;
+  flex-shrink: 0;
+  min-width: 30px;
 }
 
 .item-page {

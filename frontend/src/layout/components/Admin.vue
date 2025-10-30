@@ -44,11 +44,15 @@
     <el-container>
       <el-scrollbar max-height="100vh" style="width: 100%;">
 
-        <el-header style=" padding: 1rem  
+        <el-header style=" padding: 1rem 2rem;display: flex; justify-content: flex-end; 
 ">
           <el-space wrap :size="5">
 
-            <el-button :icon="Search" size="large" circle />
+            <el-button :icon="Search" size="large" circle> <el-badge :value="3" class="item">
+                <el-icon>
+                  <ChatLineSquare />
+                </el-icon></el-badge></el-button>
+
 
 
             <el-dropdown @command="handleCommand">
@@ -236,7 +240,7 @@ const handleCommand = async (command) => {
 
 .el-aside ul {
   border-right: none;
-  background-color: var(--background-color);
+  /* background-color: var(--background-color); */
 }
 
 

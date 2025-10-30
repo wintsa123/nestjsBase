@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { Connection, EditPen, Link, Menu } from '@element-plus/icons-vue'; // 导入 Element Plus 图标组件
+import {  EditPen, DocumentCopy, Menu } from '@element-plus/icons-vue'; // 导入 Element Plus 图标组件
 import { refreshToken as refreshTokenFn } from "@/api/user/user.ts";
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
       path: '/',
-      component: () => import('../views/Home.vue')
+      component: () => import('@/views/Home.vue')
     },
     {
       path: '/login',
@@ -34,16 +34,15 @@ const router = createRouter({
             sortid: 1,
           },
         },
-        {
-          path: '/familyTree',
-          name: 'familyTree',
-          component: () => import('../views/familyTree.vue'),
+         {
+          path: '/fileManager',
+          name: 'fileManager',
+          component: () => import('../views/FileManager.vue'),
           meta: {
             nav: true, // 表示该路由需要显示在导航菜单中
-            title: '族谱', // 菜单名称
-            icon: Connection, // 菜单图标
-            sortid: 2,
-
+            title: '文档管理', // 菜单名称
+            icon: DocumentCopy, // 菜单图标
+            sortid: 1,
           },
         },
         {
@@ -83,7 +82,6 @@ router.beforeEach(async (to: any, _from: any, next: any) => {
   const refreshToken = localStorage.getItem('refreshToken'); // 获取 Refresh Token
 
   if (to.meta.requiresAuth) {
-    console.log('requiresAuth', to.meta.requiresAuth)
     if (!accessToken) {
       // 如果没有 Access Token，跳转到登录页
       next('/login');

@@ -6,6 +6,8 @@ $--colors: (
   ),
 );
 
+
+// 引入 Element Plus 主题
 @forward 'element-plus/theme-chalk/src/dark/var.scss' with (
-  $colors: $--colors
+  $colors: $--colors,
 );

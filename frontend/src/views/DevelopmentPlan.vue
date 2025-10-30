@@ -95,16 +95,9 @@ const tableData = ref<DevelopmentTask[]>(updateParentStatus([
         developer: 'wintsa',
         completionTime: '2025/2/2'
       },
+     
       {
         id: '1-3',
-        name: '邀请用户加入族谱',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
-        completionTime: ''
-      },
-      {
-        id: '1-4',
         name: '用户无感刷新以及用户退出的token失效',
         status: '完成',
         plannedTime: '2025/2/2',
@@ -129,54 +122,61 @@ const tableData = ref<DevelopmentTask[]>(updateParentStatus([
       }
     ]
   },
-  {
+   {
     id: '2',
-    name: '族谱管理',
-    status: '未开始',
+    name: '文档管理',
+    status: '',
     plannedTime: '',
-    developer: '',
+    developer: 'wintsa',
     completionTime: '',
     children: [
       {
-        id: '2-1',
-        name: '添加/修改家族成员信息',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
-        completionTime: ''
-      },
-      {
-        id: '2-2',
-        name: '显示成员间的关系连接，显示的逻辑还需要分类，比如默认只显示三代/四代的全部树，超过的时候就只显示父系的树',
+        id: '1-1',
+        name: '文档上传',
         status: '进行中',
-        plannedTime: '2025/2/2',
+        plannedTime: '2025/10/30',
         developer: 'wintsa',
         completionTime: ''
       },
       {
-        id: '2-3',
-        name: '显示称谓关系',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
+        id: '1-2',
+        name: '文档替换',
+        status: '进行中',
+        plannedTime: '2025/10/30',
+        developer: 'wintsa',
         completionTime: ''
       },
+     ,
       {
-        id: '2-4',
-        name: '自定义修改称谓',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
+        id: '1-3',
+        name: '文档重命名',
+        status: '进行中',
+        plannedTime: '2025/10/30',
+        developer: 'wintsa',
+        completionTime: ''
+      },  {
+        id: '1-3',
+        name: '文档分类',
+        status: '进行中',
+        plannedTime: '2025/10/30',
+        developer: 'wintsa',
+        completionTime: ''
+      }, {
+        id: '1-3',
+        name: '文档删除',
+        status: '进行中',
+        plannedTime: '2025/10/30',
+        developer: 'wintsa',
         completionTime: ''
       },
-      {
-        id: '2-5',
-        name: '族谱分为主线和支线展示',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
+   , {
+        id: '1-3',
+        name: '文档下载',
+        status: '进行中',
+        plannedTime: '2025/10/30',
+        developer: 'wintsa',
         completionTime: ''
-      }
+      },
     ]
   },
   {
@@ -189,15 +189,7 @@ const tableData = ref<DevelopmentTask[]>(updateParentStatus([
     children: [
       {
         id: '3-1',
-        name: '通过微信/短信/邮箱方式发送通知',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
-        completionTime: ''
-      },
-      {
-        id: '3-2',
-        name: '喜事/坏事通知，群发通知',
+        name: '通过微信/短信/邮箱方式发送共享连接',
         status: '未开始',
         plannedTime: '',
         developer: '',
@@ -205,88 +197,8 @@ const tableData = ref<DevelopmentTask[]>(updateParentStatus([
       }
     ]
   },
-  {
-    id: '4',
-    name: '社区系统',
-    status: '未开始',
-    plannedTime: '',
-    developer: '',
-    completionTime: '',
-    children: [
-      {
-        id: '4-1',
-        name: '人生总结和野史功能',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
-        completionTime: ''
-      }
-    ]
-  },
-  {
-    id: '5',
-    name: '族史功能',
-    status: '未开始',
-    plannedTime: '',
-    developer: '',
-    completionTime: '',
-    children: [
-      {
-        id: '5-1',
-        name: '记录个人对家族的贡献',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
-        completionTime: ''
-      },
-      {
-        id: '5-2',
-        name: '总结个人对家族的贡献，家族兴旺或衰败',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
-        completionTime: ''
-      }
-    ]
-  },
-  {
-    id: '6',
-    name: '与已故之人视频聊天',
-    status: '未开始',
-    plannedTime: '',
-    developer: '',
-    completionTime: '',
-    children: [{
-        id: '6-1',
-        name: '根据图片/视频(可以提取文字内容)/文字内容生成对话，并且根据上传的内容，学习语气',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
-        completionTime: ''
-      }]  },
-  {
-    id: '7',
-    name: 'AI人脸相册',
-    status: '未开始',
-    plannedTime: '',
-    developer: '',
-    completionTime: '',
-    children: [{
-        id: '7-1',
-        name: '上传图片，人脸识别，可以合并',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
-        completionTime: ''
-      },{
-        id: '7-2',
-        name: '允许拍摄，通过人脸识别，让使用者方便查找此人是xxx哪个亲戚，应该叫的名称是什么',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
-        completionTime: ''
-      },]
-  },
+
+
   {
     id: '8',
     name: 'UI设计美化优化',
@@ -320,13 +232,6 @@ const tableData = ref<DevelopmentTask[]>(updateParentStatus([
         completionTime: ''
       },
       {
-        id: '8-4',
-        name: '主页换成vitepress,静态页面方便被收录',
-        status: '未开始',
-        plannedTime: '',
-        developer: '',
-        completionTime: ''
-      }, {
         id: '8-5',
         name: 'aside栏的收缩功能',
         status: '完成',

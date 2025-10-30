@@ -11,9 +11,15 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
     method.config.headers.Authorization = 'Bearer ' + localStorage.getItem('token');
   },
   async login(response: any, method) {
+
     const data = await response.clone().json()
 
 
+    if (data.code != 0) {
+              ElMessage.error(data.message || data.params.message)
+
+      throw data.message
+    }
     ElMessage.success(data.message)
     localStorage.setItem('token', data.data.token);
     localStorage.setItem('refresh_token', data.data.refresh_token);
