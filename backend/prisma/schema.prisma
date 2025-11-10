@@ -38,3 +38,40 @@ enum Role {
   USER
   ADMIN
 }
+
+model Directory {
+  id          String       @id @default(cuid())
+  name        String                         // 目录名称
+  parentId    String?                        // 上级目录ID（可为空）
+  parent      Directory?    @relation("SubDirs", fields: [parentId], references: [id])
+  subDirs     Directory[]   @relation("SubDirs")
+    files       File[]                           // 当前目录下的文件
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model File {
+  id            String    @id @default(cuid())
+  directoryId   String?
+  directory     Directory? @relation(fields: [directoryId], references: [id])
+
+  fileName      String                          // 文件名（如 report.pdf）
+  fileType      String?                         // 文件类型（pdf, docx, txt...）
+  fileSize      Int
+  md5Hash       String?   @unique                // 文件内容hash（用于去重）
+  uploaderId    String?                          // 上传人ID（可与用户表关联）
+  text          Text?      @relation("FileText")  // ✅ 可选反向引用
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+}
+model Text{
+    id            String    @id @default(cuid())
+  fileId       String    @unique                   // ✅ 外键 + 唯一约束（保证1:1）
+  file         File      @relation("FileText", fields: [fileId], references: [id])
+
+ // 解析后的纯文本，用于全文搜索
+  contentText   String?                         
+  searchVector  Unsupported("tsvector")?         // PostgreSQL全文索引字段
+}

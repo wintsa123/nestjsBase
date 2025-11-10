@@ -36,27 +36,29 @@
 
     <!-- 列表模式 -->
     <div v-if="viewMode === 'list'" class="list-view" @contextmenu.prevent="handleEmptyContextMenu">
-      <TransitionGroup name="list" tag="div">
+      <VueDraggable
+        v-model="files"
+        ghostClass="ghost"
+         :animation="150"
+        @start="onDragStart"
+        @end="onDragEnd"
+        @update="onDragChange"
+      >
         <div
-          v-for="item in sortedFiles"
+          v-for="item in files"
           :key="item.id"
-          :draggable="true"
-          @dragstart="handleDragStart($event, item)"
-          @dragover="handleDragOver($event, item)"
-          @dragleave="handleDragLeave"
-          @dragend="handleDragEnd"
-          @drop="handleDrop($event, item)"
           @contextmenu.prevent="handleContextMenu($event, item)"
           @dblclick="handleOpen(item)"
-          :class="[
-            'file-item', 
-            { 
-              'dragging': draggedItem?.id === item.id,
-              'drag-over': dragOverItem?.id === item.id && draggedItem?.id !== item.id
-            }
-          ]"
+          :class="['file-item', { 'drag-over-folder': dragOverFolder?.id === item.id }]"
+       
         >
           <div class="file-content">
+            <div class="drag-handle">
+              <el-icon :size="20" style="cursor: move; color: #9ca3af;">
+                <Rank />
+              </el-icon>
+            </div>
+            
             <el-icon :size="24" :color="item.type === 'folder' ? '#f59e0b' : '#3b82f6'">
               <Folder v-if="item.type === 'folder'" />
               <Document v-else />
@@ -77,39 +79,36 @@
             <span class="sort-order">#{{ item.sortOrder }}</span>
           </div>
 
-          <el-button
-            text
-            @click.stop="handleContextMenu($event, item)"
-            class="more-btn"
-          >
-            <el-icon><MoreFilled /></el-icon>
-          </el-button>
+          
         </div>
-      </TransitionGroup>
+      </VueDraggable>
     </div>
 
     <!-- 平铺模式 -->
     <div v-else class="grid-view" @contextmenu.prevent="handleEmptyContextMenu">
-      <TransitionGroup name="grid" tag="div" class="grid-container">
+      <VueDraggable
+        v-model="files"
+        ghostClass="ghost"
+        class="grid-container"
+        :animation="300"
+        @start="onDragStart"
+        @end="onDragEnd"
+        @update="onDragChange"
+      >
         <div
-          v-for="item in sortedFiles"
+          v-for="item in files"
           :key="item.id"
-          :draggable="true"
-          @dragstart="handleDragStart($event, item)"
-          @dragover="handleDragOver($event, item)"
-          @dragleave="handleDragLeave"
-          @dragend="handleDragEnd"
-          @drop="handleDrop($event, item)"
           @contextmenu.prevent="handleContextMenu($event, item)"
           @dblclick="handleOpen(item)"
-          :class="[
-            'grid-item', 
-            { 
-              'dragging': draggedItem?.id === item.id,
-              'drag-over': dragOverItem?.id === item.id && draggedItem?.id !== item.id
-            }
-          ]"
+          :class="['grid-item', { 'drag-over-folder': dragOverFolder?.id === item.id }]"
+         
         >
+          <div class="grid-drag-handle">
+            <el-icon :size="16" style="cursor: move; color: #9ca3af;">
+              <Rank />
+            </el-icon>
+          </div>
+          
           <div class="grid-icon">
             <el-icon :size="64" :color="item.type === 'folder' ? '#f59e0b' : '#3b82f6'">
               <Folder v-if="item.type === 'folder'" />
@@ -130,7 +129,7 @@
           />
           <div v-else class="grid-name">{{ item.name }}</div>
         </div>
-      </TransitionGroup>
+      </VueDraggable>
     </div>
 
     <!-- 右键菜单 -->
@@ -150,51 +149,56 @@
           <el-icon><FolderAdd /></el-icon>
           <span>新建文件夹</span>
         </div>
+         <div class="menu-item" @click="handleCreateFolder">
+          <el-icon><FolderAdd /></el-icon>
+          <span>上传文件</span>
+        </div>
       </template>
       
       <!-- 文件/文件夹右键菜单 -->
       <template v-else>
-      <div class="menu-item" @click="handleOpen(contextMenu.item)">
-        <el-icon><View /></el-icon>
-        <span>打开</span>
-      </div>
-      <div class="menu-item" @click="handleRename(contextMenu.item)">
-        <el-icon><Edit /></el-icon>
-        <span>重命名</span>
-      </div>
-      <div class="menu-item" @click="handleSetSortOrder(contextMenu.item)">
-        <el-icon><Sort /></el-icon>
-        <span>设置排序号</span>
-      </div>
-      <el-divider style="margin: 4px 0" />
-      <div class="menu-item" @click="handleCopy(contextMenu.item)">
-        <el-icon><CopyDocument /></el-icon>
-        <span>复制</span>
-      </div>
-      <div class="menu-item" @click="handleCut(contextMenu.item)">
-        <el-icon><ScissorIcon /></el-icon>
-        <span>剪切</span>
-      </div>
-      <div class="menu-item" :class="{ disabled: !clipboard }" @click="handlePaste">
-        <el-icon><DocumentCopy /></el-icon>
-        <span>粘贴</span>
-      </div>
-      <div class="menu-item" @click="handleCreateFolder">
-        <el-icon><FolderAdd /></el-icon>
-        <span>新建文件夹</span>
-      </div>
-      <el-divider style="margin: 4px 0" />
-      <div class="menu-item danger" @click="handleDelete(contextMenu.item)">
-        <el-icon><Delete /></el-icon>
-        <span>删除</span>
-      </div>
+        <div class="menu-item" @click="handleOpen(contextMenu.item)">
+          <el-icon><View /></el-icon>
+          <span>打开</span>
+        </div>
+        <div class="menu-item" @click="handleRename(contextMenu.item)">
+          <el-icon><Edit /></el-icon>
+          <span>重命名</span>
+        </div>
+        <div class="menu-item" @click="handleSetSortOrder(contextMenu.item)">
+          <el-icon><Sort /></el-icon>
+          <span>设置排序号</span>
+        </div>
+        <el-divider style="margin: 4px 0" />
+        <div class="menu-item" @click="handleCopy(contextMenu.item)">
+          <el-icon><CopyDocument /></el-icon>
+          <span>复制</span>
+        </div>
+        <div class="menu-item" @click="handleCut(contextMenu.item)">
+          <el-icon><ScissorIcon /></el-icon>
+          <span>剪切</span>
+        </div>
+        <div class="menu-item" :class="{ disabled: !clipboard }" @click="handlePaste">
+          <el-icon><DocumentCopy /></el-icon>
+          <span>粘贴</span>
+        </div>
+        <div class="menu-item" @click="handleCreateFolder">
+          <el-icon><FolderAdd /></el-icon>
+          <span>新建文件夹</span>
+        </div>
+        <el-divider style="margin: 4px 0" />
+        <div class="menu-item danger" @click="handleDelete(contextMenu.item)">
+          <el-icon><Delete /></el-icon>
+          <span>删除</span>
+        </div>
       </template>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from 'vue';
+import { ref, computed, nextTick, watch } from 'vue';
+import { VueDraggable } from 'vue-draggable-plus';
 import { 
   Folder, 
   Document, 
@@ -206,7 +210,8 @@ import {
   CopyDocument,
   DocumentCopy,
   Sort,
-  HomeFilled
+  HomeFilled,
+  Rank
 } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
@@ -233,8 +238,6 @@ const allFiles = ref({
     { id: 6, name: '音乐', type: 'folder', sortOrder: 6, children: [] },
     { id: 7, name: 'package.json', type: 'file', sortOrder: 7 },
     { id: 8, name: 'index.html', type: 'file', sortOrder: 8 },
-     { id: 9, name: '2.json', type: 'file', sortOrder: 7 },
-    { id: 10, name: 'index.pdf', type: 'file', sortOrder: 8 },
   ],
   '/文档': [
     { id: 11, name: '工作文档.docx', type: 'file', sortOrder: 1 },
@@ -247,21 +250,23 @@ const allFiles = ref({
 });
 
 // 当前显示的文件列表
-const files = ref(allFiles.value['/']);
+const files = ref([...allFiles.value['/']]);
 
 const contextMenu = ref({ show: false, x: 0, y: 0, item: null });
 const editingId = ref(null);
 const editingName = ref('');
-const draggedItem = ref(null);
-const dragOverItem = ref(null);
 const clipboard = ref(null);
 const editInput = ref(null);
-const dragTimer = ref(null);  // 防抖定时器
-const lastTargetId = ref(null);  // 记录上一次的目标ID，避免重复触发
+const draggedItem = ref(null);  // 当前拖拽的项
+const dragOverFolder = ref(null);  // 鼠标悬停的文件夹
+const dragEnterTimer = ref(null);  // 延迟进入文件夹的定时器
 
-const sortedFiles = computed(() => {
-  return [...files.value].sort((a, b) => a.sortOrder - b.sortOrder);
-});
+// 监听文件列表变化，更新排序号
+watch(files, (newFiles) => {
+  newFiles.forEach((file, index) => {
+    file.sortOrder = index + 1;
+  });
+}, { deep: true });
 
 // 获取当前路径字符串
 const getCurrentPathString = () => {
@@ -274,12 +279,12 @@ const navigateToPath = (index) => {
   if (index === 0) {
     // 返回根目录
     currentPath.value = [];
-    files.value = allFiles.value['/'];
+    files.value = [...allFiles.value['/']];
   } else {
     // 返回到某个上级目录
     currentPath.value = currentPath.value.slice(0, index);
     const pathString = getCurrentPathString();
-    files.value = allFiles.value[pathString] || [];
+    files.value = [...(allFiles.value[pathString] || [])];
   }
   // TODO: 调用API加载对应路径的文件
   console.log('导航到路径:', getCurrentPathString());
@@ -334,9 +339,10 @@ const confirmRename = () => {
   if (editingName.value.trim()) {
     // TODO: 调用重命名API
     console.log('重命名:', editingId.value, editingName.value);
-    files.value = files.value.map(f => 
-      f.id === editingId.value ? { ...f, name: editingName.value } : f
-    );
+    const item = files.value.find(f => f.id === editingId.value);
+    if (item) {
+      item.name = editingName.value;
+    }
     ElMessage.success('重命名成功');
   }
   editingId.value = null;
@@ -371,7 +377,7 @@ const handleOpen = (item) => {
     
     // 加载文件夹内容
     if (allFiles.value[pathString]) {
-      files.value = allFiles.value[pathString];
+      files.value = [...allFiles.value[pathString]];
     } else {
       files.value = [];
     }
@@ -438,12 +444,19 @@ const handleSetSortOrder = async (item) => {
     });
     
     if (value) {
-      // TODO: 调用设置排序API
-      console.log('设置排序:', item.id, value, '路径:', getCurrentPathString());
-      files.value = files.value.map(f => 
-        f.id === item.id ? { ...f, sortOrder: parseInt(value) } : f
-      );
-      ElMessage.success('排序设置成功');
+      const newOrder = parseInt(value);
+      const currentIndex = files.value.findIndex(f => f.id === item.id);
+      
+      if (currentIndex !== -1) {
+        // 移除当前项
+        const [movedItem] = files.value.splice(currentIndex, 1);
+        // 插入到新位置
+        files.value.splice(newOrder - 1, 0, movedItem);
+        
+        // TODO: 调用设置排序API
+        console.log('设置排序:', item.id, value, '路径:', getCurrentPathString());
+        ElMessage.success('排序设置成功');
+      }
     }
   } catch {
     // 用户取消
@@ -451,101 +464,84 @@ const handleSetSortOrder = async (item) => {
   closeContextMenu();
 };
 
-const handleDragStart = (e, item) => {
-  draggedItem.value = item;
-  lastTargetId.value = null;  // 重置目标ID
-  e.dataTransfer.effectAllowed = 'move';
+// VueDraggable 事件处理
+const onDragStart = (evt) => {
+  draggedItem.value = files.value[evt.oldIndex];
+  console.log('开始拖拽:', draggedItem.value);
 };
 
-const handleDragOver = (e, targetItem) => {
+const onDragEnd = (evt) => {
+  console.log('拖拽结束');
+  draggedItem.value = null;
+  dragOverFolder.value = null;
+  
+  // 清除定时器
+  if (dragEnterTimer.value) {
+    clearTimeout(dragEnterTimer.value);
+    dragEnterTimer.value = null;
+  }
+};
+
+const onDragChange = (evt) => {
+  // TODO: 调用保存排序API
+  console.log('排序变化:', files.value.map(f => ({ id: f.id, sortOrder: f.sortOrder })));
+  ElMessage.success('排序已更新');
+};
+
+// 拖拽进入文件夹
+const handleDragEnterFolder = (e, item) => {
+  if (!draggedItem.value || draggedItem.value.id === item.id || item.type !== 'folder') {
+    return;
+  }
+  
   e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  
-  if (!draggedItem.value || draggedItem.value.id === targetItem.id) {
-    return;
-  }
-  
-  // 如果目标项没有变化，直接返回，避免重复触发
-  if (lastTargetId.value === targetItem.id) {
-    return;
-  }
-  
-  lastTargetId.value = targetItem.id;
+  dragOverFolder.value = item;
   
   // 清除之前的定时器
-  if (dragTimer.value) {
-    clearTimeout(dragTimer.value);
+  if (dragEnterTimer.value) {
+    clearTimeout(dragEnterTimer.value);
   }
   
-  // 设置防抖，100ms 后才执行排序
-  dragTimer.value = setTimeout(() => {
-    // 实时更新拖放目标
-    dragOverItem.value = targetItem;
-    
-    // 如果不是文件夹，实时预览排序效果
-    if (targetItem.type !== 'folder') {
-      const draggedIndex = files.value.findIndex(f => f.id === draggedItem.value.id);
-      const targetIndex = files.value.findIndex(f => f.id === targetItem.id);
-      
-      if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
-        // 创建新数组进行排序预览
-        const newFiles = [...files.value];
-        const [draggedFile] = newFiles.splice(draggedIndex, 1);
-        newFiles.splice(targetIndex, 0, draggedFile);
-        
-        // 重新分配排序号
-        newFiles.forEach((file, index) => {
-          file.sortOrder = index + 1;
-        });
-        
-        files.value = newFiles;
-      }
-    }
-  }, 100);  // 100ms 防抖延迟
+  // 悬停 800ms 后自动打开文件夹
+  dragEnterTimer.value = setTimeout(() => {
+    console.log('自动打开文件夹:', item.name);
+    handleOpen(item);
+  }, 800);
 };
 
-const handleDragLeave = () => {
-  // dragOverItem.value = null;
-};
-
-const handleDragEnd = () => {
-  // 清除防抖定时器
-  if (dragTimer.value) {
-    clearTimeout(dragTimer.value);
-    dragTimer.value = null;
+const handleDragLeaveFolder = (e, item) => {
+  if (dragOverFolder.value?.id === item.id) {
+    dragOverFolder.value = null;
   }
   
-  draggedItem.value = null;
-  dragOverItem.value = null;
-  lastTargetId.value = null;  // 重置目标ID
+  // 清除定时器
+  if (dragEnterTimer.value) {
+    clearTimeout(dragEnterTimer.value);
+    dragEnterTimer.value = null;
+  }
 };
 
-const handleDrop = (e, targetItem) => {
+const handleDropIntoFolder = (e, item) => {
   e.preventDefault();
   e.stopPropagation();
   
-  // 清除防抖定时器
-  if (dragTimer.value) {
-    clearTimeout(dragTimer.value);
-    dragTimer.value = null;
+  // 清除定时器
+  if (dragEnterTimer.value) {
+    clearTimeout(dragEnterTimer.value);
+    dragEnterTimer.value = null;
   }
   
-  if (draggedItem.value && draggedItem.value.id !== targetItem.id) {
-    if (targetItem.type === 'folder') {
-      // TODO: 调用移动到文件夹API
-      console.log('移动到文件夹:', draggedItem.value, '→', targetItem, '当前路径:', getCurrentPathString());
-      ElMessage.success(`已移动到 ${targetItem.name}`);
-    } else {
-      // 排序已经在 dragOver 中实时更新了，这里只需要保存
-      // TODO: 调用保存排序API
-      console.log('更新排序:', files.value.map(f => ({ id: f.id, sortOrder: f.sortOrder })), '路径:', getCurrentPathString());
-      ElMessage.success('排序已更新');
-    }
+  if (draggedItem.value && item.type === 'folder' && draggedItem.value.id !== item.id) {
+    // TODO: 调用移动到文件夹API
+    console.log('移动文件到文件夹:', draggedItem.value, '→', item);
+    
+    // 从当前列表移除
+    files.value = files.value.filter(f => f.id !== draggedItem.value.id);
+    
+    ElMessage.success(`已移动到 ${item.name}`);
   }
   
-  draggedItem.value = null;
-  dragOverItem.value = null;
-  lastTargetId.value = null;  // 重置目标ID
+  dragOverFolder.value = null;
 };
 </script>
 
@@ -605,31 +601,6 @@ const handleDrop = (e, targetItem) => {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Vue TransitionGroup 动画 - 列表模式 */
-.list-move {
-  transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.list-enter-active,
-.list-leave-active {
-  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.list-enter-from {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-.list-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.list-leave-active {
-  position: absolute;
-  width: 100%;
-}
-
 .file-item {
   display: flex;
   align-items: center;
@@ -638,27 +609,36 @@ const handleDrop = (e, targetItem) => {
   border: 2px solid #e5e7eb;
   border-radius: 8px;
   margin-bottom: 8px;
-  cursor: move;
-  transition: all 0.2s ease;
   background: white;
 }
 
 .file-item:hover {
   background: #f9fafb;
   border-color: #d1d5db;
-}
+} 
 
-.file-item.dragging {
-  opacity: 0.4;
-  border-color: #3b82f6;
-  transform: scale(0.98);
-}
-
-.file-item.drag-over {
+ .file-item.drag-over-folder {
   border-color: #67c23a;
   background: #f0f9ff;
   transform: scale(1.02);
   box-shadow: 0 4px 12px rgba(103, 194, 58, 0.2);
+} 
+
+/* VueDraggable 类名 */
+.ghost {
+  opacity: 0.4;
+  background: #f0f9ff;
+  border-color: #3b82f6;
+}
+
+.chosen {
+  opacity: 0.8;
+  border-color: #3b82f6;
+}
+
+.dragging {
+  opacity: 0.5;
+  transform: rotate(3deg);
 }
 
 .file-content {
@@ -666,6 +646,12 @@ const handleDrop = (e, targetItem) => {
   align-items: center;
   gap: 12px;
   flex: 1;
+}
+
+.drag-handle {
+  display: flex;
+  align-items: center;
+  padding: 4px;
 }
 
 .file-name {
@@ -705,30 +691,6 @@ const handleDrop = (e, targetItem) => {
   gap: 16px;
 }
 
-/* Vue TransitionGroup 动画 - 平铺模式 */
-.grid-move {
-  transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.grid-enter-active,
-.grid-leave-active {
-  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.grid-enter-from {
-  opacity: 0;
-  transform: scale(0.8);
-}
-
-.grid-leave-to {
-  opacity: 0;
-  transform: scale(0.8);
-}
-
-.grid-leave-active {
-  position: absolute;
-}
-
 .grid-item {
   display: flex;
   flex-direction: column;
@@ -736,8 +698,7 @@ const handleDrop = (e, targetItem) => {
   padding: 20px;
   border: 2px solid #e5e7eb;
   border-radius: 8px;
-  cursor: move;
-  transition: all 0.2s ease;
+  /* transition: all 0.2s ease; */
   background: white;
   position: relative;
 }
@@ -749,17 +710,25 @@ const handleDrop = (e, targetItem) => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.grid-item.dragging {
-  opacity: 0.4;
-  border-color: #3b82f6;
-  transform: scale(0.95) rotate(3deg);
-}
-
-.grid-item.drag-over {
+.grid-item.drag-over-folder {
   border-color: #67c23a;
   background: #f0f9ff;
   transform: scale(1.05);
   box-shadow: 0 8px 20px rgba(103, 194, 58, 0.3);
+}
+
+.grid-drag-handle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px;
+  cursor: move;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.grid-item:hover .grid-drag-handle {
+  opacity: 1;
 }
 
 .grid-icon {

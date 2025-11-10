@@ -1,4 +1,4 @@
-import { UseInterceptors, Controller, Post, Body, UseGuards, Request, ClassSerializerInterceptor, Req, Res, Get } from '@nestjs/common';
+import { UseInterceptors, Controller, Post, Body, UseGuards, Request, ClassSerializerInterceptor, Req, Res, Get, UnauthorizedException } from '@nestjs/common';
 import { userService } from './user.service';
 import { user } from './dto/user.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -45,6 +45,9 @@ export class AuthController {
   @Post('refresh')
   async refresh(@Body() data: { refreshToken: string }) {
     // const cookies = request.cookies; // 获取所有 Cookie
+    if (!data.refreshToken) {
+      throw new UnauthorizedException('Refresh token is required');
+    }
     // const refreshTokenFromCookie = cookies['refreshToken']; // 获取指定的 Cookie（假设你用的是 `refreshToken` 作为 Cookie 的键名）
     return this.authService.refresh(data.refreshToken);
   }

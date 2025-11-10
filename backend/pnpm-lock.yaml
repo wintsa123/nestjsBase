@@ -134,6 +134,9 @@ importers:
       json-bigint:
         specifier: ^1.0.0
         version: 1.0.0
+      libreoffice-convert:
+        specifier: ^1.7.0
+        version: 1.7.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -3519,6 +3522,10 @@ packages:
   libphonenumber-js@1.12.25:
     resolution: {integrity: sha512-u90tUu/SEF8b+RaDKCoW7ZNFDakyBtFlX1ex3J+VH+ElWes/UaitJLt/w4jGu8uAE41lltV/s+kMVtywcMEg7g==}
 
+  libreoffice-convert@1.7.0:
+    resolution: {integrity: sha512-sPG+ikVfJGNf6zEZxvmfNSAQQ+wM78Zdg2C1ikAiqL3NlmPTs3004TypsxICJ6IGkrqXr9wlxBs6wB905vYLOw==}
+    engines: {node: '>=6'}
+
   light-my-request@6.6.0:
     resolution: {integrity: sha512-CHYbu8RtboSIoVsHZ6Ye4cj4Aw/yg2oAFimlF7mNvfDV192LR7nDiKtSIfCuLT7KokPSTn/9kfVLm5OGN0A28A==}
 
@@ -4619,6 +4626,10 @@ packages:
   tmp@0.0.33:
     resolution: {integrity: sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw==}
     engines: {node: '>=0.6.0'}
+
+  tmp@0.2.5:
+    resolution: {integrity: sha512-voyz6MApa1rQGUxT3E+BK7/ROe8itEx7vD8/HEvt4xwXucvQ5G5oeEiHkmHZJuBO21RpOf+YYm9MOivj709jow==}
+    engines: {node: '>=14.14'}
 
   tmpl@1.0.5:
     resolution: {integrity: sha512-3f0uOEAQwIqGuWW2MVzYg8fV/QNnc/IpuJNG837rLuczAaLVHslWHZQj4IGiEl5Hs3kkbhwL9Ab7Hrsmuj+Smw==}
@@ -8879,6 +8890,11 @@ snapshots:
 
   libphonenumber-js@1.12.25: {}
 
+  libreoffice-convert@1.7.0:
+    dependencies:
+      async: 3.2.6
+      tmp: 0.2.5
+
   light-my-request@6.6.0:
     dependencies:
       cookie: 1.0.2
@@ -9927,6 +9943,8 @@ snapshots:
   tmp@0.0.33:
     dependencies:
       os-tmpdir: 1.0.2
+
+  tmp@0.2.5: {}
 
   tmpl@1.0.5: {}
 
