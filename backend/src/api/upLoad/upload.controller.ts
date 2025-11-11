@@ -3,17 +3,19 @@ import {
   Post,
   Body,
   UseInterceptors,
-  UploadedFile,
   BadRequestException,
   Query,
   Delete,
-  Param
+  Param,
+  UploadedFile
 } from '@nestjs/common';
+import { FileInterceptor, MulterFile } from '@webundsoehne/nest-fastify-file-upload';
+
 import { UploadService } from './upload.service';
 
 @Controller('upload')
 export class UploadController {
-  constructor(private readonly uploadService: UploadService) {}
+  constructor(private readonly uploadService: UploadService) { }
 
   /**
    * 小文件直接上传接口
@@ -21,17 +23,18 @@ export class UploadController {
    */
   @Post('small')
   @UseInterceptors(FileInterceptor('file'))
+
+
   async uploadSmallFile(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile('file') file: MulterFile,
     @Body('directoryId') directoryId?: string,
     @Body('uploaderId') uploaderId?: string
   ) {
     if (!file) {
       throw new BadRequestException('请上传文件');
     }
-
     // 检查文件大小（小于10MB）
-    const MAX_SIZE = 10 * 1024 * 1024;
+    const MAX_SIZE = 50 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
       throw new BadRequestException('文件过大，请使用分片上传');
     }
@@ -81,7 +84,7 @@ export class UploadController {
   @Post('chunk')
   @UseInterceptors(FileInterceptor('chunk'))
   async uploadChunk(
-    @UploadedFile() chunk: Express.Multer.File,
+    @UploadedFile() chunk: any,
     @Body('sessionId') sessionId: string,
     @Body('chunkIndex') chunkIndex: string
   ) {

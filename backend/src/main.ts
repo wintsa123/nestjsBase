@@ -6,7 +6,7 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { fastifyHelmet } from '@fastify/helmet';
 import * as fastifyXmlBody from 'fastify-xml-body-parser';
-import fastifyMultipart from '@fastify/multipart';
+import {fastifyMultipart} from '@fastify/multipart';
 declare const module: any;
 
 import fastifyCsrf from '@fastify/csrf-protection';

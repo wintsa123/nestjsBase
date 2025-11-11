@@ -8,7 +8,7 @@
   "scripts": {
     "copy-static-files": "node copy-static-files.js",
     "build": "nest build && node copy-static-files",
-    "newSql": "npx prisma db push && npx prisma generate",
+    "newSql": "npx prisma db push && npx prisma generate && pnpn run seed",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "cross-env RUNNING_ENV=dev nest start",
     "start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js   --watch",
@@ -25,10 +25,14 @@
     "pm2:dev": "nest build && node copy-static-files && pm2 start ecosystem.config.js --env development",
     "pm2:test": "nest build && node copy-static-files && pm2 start ecosystem.config.js --env test",
     "update": "git pull  && nest build && node copy-static-files && &&pm2 restart zw-nestjs &&pm2 log",
-    "gitpush": "git add . && git commit -m \"backup  %DATE% %TIME%\" && git push"
+    "gitpush": "git add . && git commit -m \"backup  %DATE% %TIME%\" && git push",
+      "seed": "ts-node prisma/seed.ts"
+
   },
+  "prisma": {
+  "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+},
   "dependencies": {
-    "@blazity/nest-file-fastify": "^1.0.0",
     "@fastify/cookie": "^11.0.2",
     "@fastify/csrf-protection": "^7.1.0",
     "@fastify/helmet": "^13.0.2",
@@ -50,6 +54,7 @@
     "@nestjs/websockets": "^11.1.8",
     "@prisma/client": "^6.18.0",
     "@upstash/redis": "^1.35.6",
+    "@webundsoehne/nest-fastify-file-upload": "^2.3.1",
     "ali-oss": "^6.23.0",
     "axios": "^1.13.1",
     "bcrypt": "^6.0.0",
@@ -65,6 +70,7 @@
     "form-data": "^4.0.4",
     "fs": "0.0.1-security",
     "fs-extra": "^11.3.2",
+    "hash-wasm": "^4.12.0",
     "iconv-lite": "^0.7.0",
     "ioredis": "^5.8.2",
     "is-stream": "^4.0.1",
