@@ -8,7 +8,7 @@
   "scripts": {
     "copy-static-files": "node copy-static-files.js",
     "build": "nest build && node copy-static-files",
-    "newSql": "npx prisma db push && npx prisma generate && pnpm run seed",
+    "newSql": "npx prisma db push && npx prisma generate",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "cross-env RUNNING_ENV=dev nest start",
     "start:dev": "nest build --webpack --webpackPath webpack-hmr.config.js   --watch",
@@ -25,12 +25,9 @@
     "pm2:dev": "nest build && node copy-static-files && pm2 start ecosystem.config.js --env development",
     "pm2:test": "nest build && node copy-static-files && pm2 start ecosystem.config.js --env test",
     "update": "git pull  && nest build && node copy-static-files && &&pm2 restart zw-nestjs &&pm2 log",
-    "gitpush": "git add . && git commit -m \"backup  %DATE% %TIME%\" && git push",
-    "seed": "ts-node prisma/seed.ts"
+    "gitpush": "git add . && git commit -m \"backup  %DATE% %TIME%\" && git push"
   },
-  "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
-  },
+
   "dependencies": {
     "@fastify/cookie": "^11.0.2",
     "@fastify/csrf-protection": "^7.1.0",

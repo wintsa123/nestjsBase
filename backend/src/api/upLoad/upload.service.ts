@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
 import * as crypto from 'crypto';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -9,13 +9,16 @@ import { promisify } from 'util';
 import { PrismaService } from '@src/plugin/prisma/prisma.service';
 import { blake3 } from 'hash-wasm';
 
+import { fileDto } from './dto/fileDto';
+import { isValidFileName } from '@src/utils';
+import { directoryDto } from './dto/directoryDto';
 
 @Injectable()
 export class UploadService {
     private readonly UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
     private readonly CHUNK_SIZE = 50 * 1024 * 1024; // 50MB 切片大小
     private readonly SMALL_FILE_THRESHOLD = 100 * 1024 * 1024; // 100MB 以下直接上传
-
+    private rootId?: string;
     // 临时存储分片上传的信息
     private uploadSessions = new Map<string, {
         fileName: string;
@@ -28,11 +31,30 @@ export class UploadService {
     constructor(private prisma: PrismaService,
     ) {
         this.initUploadDir();
+
     }
 
     private async initUploadDir() {
         await fs.ensureDir(this.UPLOAD_DIR);
         await fs.ensureDir(path.join(this.UPLOAD_DIR, 'temp'));
+        const root = await this.prisma.directory.findFirst({
+            where: { parentId: null }, // 或者根据你的唯一字段改
+        });
+
+        if (!root) {
+            const result = await this.prisma.directory.create({
+                data: {
+                    name: '/',
+                    parentId: null, // 根目录没有上级
+                },
+            });
+            this.rootId = result.id
+            console.log('已创建根目录', result);
+        } else {
+            console.log('根目录已存在');
+            this.rootId = root.id
+
+        }
     }
 
     /**
@@ -336,11 +358,11 @@ export class UploadService {
         isDuplicate: boolean = false
     ) {
         const maxSortResult = await this.prisma.file.aggregate({
-    _max: { sort: true },
-    where: { directoryId: directoryId ?? null },
-  });
+            _max: { sort: true },
+            where: { directoryId: directoryId ?? null },
+        });
 
-  const nextSort = (maxSortResult._max.sort ?? 0) + 1;
+        const nextSort = (maxSortResult._max.sort ?? 0) + 1;
         // 如果是重复文件，创建新的文件记录但指向同一个物理文件
         const file = await this.prisma.file.create({
             data: {
@@ -375,20 +397,490 @@ export class UploadService {
         }
         return { message: '上传已取消' };
     }
-    async addType(directoryId: string, TypeName: string) {
-        return await this.prisma.directory.create({
+    async addDirectory(directoryId: string, DirectoryName: string) {
+        return await this.prisma.$transaction(async (tx) => {
+            const existingDirectory = await tx.directory.findFirst({
+                where: {
+                    name: DirectoryName,
+                    parentId: directoryId,
+                }
+            });
 
-            data: {
-                parentId: directoryId,
-                name: TypeName
+            if (existingDirectory) {
+                throw new ConflictException('目标位置已存在同名文件夹');
+            }
+            return await this.prisma.directory.create({
+
+                data: {
+                    parentId: directoryId,
+                    name: DirectoryName
+                }
+            })
+        })
+    }
+    /**
+  * @Author: wintsa
+  * @Date: 2025-11-12 
+  * @LastEditors: wintsa
+  * @Description: 删除文件，并且检索，如果无其他，删除文件夹
+  * @returns {*} 
+  */
+    async deleteFile(fileId: string) {
+        // 使用事务确保数据一致性
+        return await this.prisma.$transaction(async (tx) => {
+            // 1️⃣ 查出文件信息
+            const file = await tx.file.findUnique({
+                where: { id: fileId },
+                select: { hash: true, fileName: true },
+            });
+
+            if (!file) throw new BadRequestException('文件不存在');
+
+            // 2️⃣ 删除数据库记录（先删除，避免计数问题）
+            const deletedFile = await tx.file.delete({
+                where: { id: fileId }
+            });
+
+            // 3️⃣ 检查是否还有其他文件使用相同的 hash
+            const hashCount = await tx.file.count({
+                where: { hash: file.hash },
+            });
+
+            // 4️⃣ 如果没有其他文件使用该 hash，删除物理文件
+            if (hashCount === 0) {
+                const fileNameWithoutExt = path.parse(file.fileName).name;
+                const filePath = path.join(this.UPLOAD_DIR, fileNameWithoutExt, file.hash);
+
+                try {
+                    await fs.remove(filePath);
+                } catch (error) {
+                    // 记录错误但不阻断流程（物理文件可能已被手动删除）
+                    console.error(`Failed to delete file: ${filePath}`, error);
+                }
+
+                // 5️⃣ 检查文件夹是否还有其他文件
+                const fileNameCount = await tx.file.count({
+                    where: { fileName: file.fileName },
+                });
+
+                // 6️⃣ 如果文件夹为空，删除文件夹
+                if (fileNameCount === 0) {
+                    const dirPath = path.join(this.UPLOAD_DIR, fileNameWithoutExt);
+                    try {
+                        await fs.remove(dirPath);
+                    } catch (error) {
+                        console.error(`Failed to delete directory: ${dirPath}`, error);
+                    }
+                }
+            }
+
+            return deletedFile;
+        });
+    }
+
+
+    /**
+     * @Description: 更新文件信息（重命名/移动/排序）
+     */
+    async updateFile(fileId: string, fileDto: fileDto) {
+        return await this.prisma.$transaction(async (tx) => {
+            // 1️⃣ 获取原文件信息
+            const originalFile = await tx.file.findUnique({
+                where: { id: fileId },
+                select: {
+                    id: true,
+                    fileName: true,
+                    hash: true,
+                    directoryId: true,
+                    sort: true,
+                }
+            });
+
+            if (!originalFile) {
+                throw new BadRequestException('文件不存在');
+            }
+
+            const data: any = {};
+            let needHandlePhysicalFile = false;
+            let oldFileNameWithoutExt = '';
+            let newFileNameWithoutExt = '';
+
+            // 2️⃣ 处理重命名
+            if (fileDto.fileName !== undefined && fileDto.fileName !== originalFile.fileName) {
+                // 检查新文件名是否合法
+                if (!isValidFileName(fileDto.fileName)) {
+                    throw new BadRequestException('文件名不合法');
+                }
+
+
+
+
+
+                // 检查文件夹名称是否改变
+                oldFileNameWithoutExt = path.parse(originalFile.fileName).name;
+                newFileNameWithoutExt = path.parse(fileDto.fileName).name;
+
+                if (oldFileNameWithoutExt !== newFileNameWithoutExt) {
+                    needHandlePhysicalFile = true;
+                }
+
+                data.fileName = fileDto.fileName;
+            }
+
+            // 3️⃣ 处理移动到其他文件夹
+            if (fileDto.directoryId !== undefined && fileDto.directoryId !== originalFile.directoryId) {
+                // 检查目标文件夹是否存在
+                if (fileDto.directoryId) {
+                    const targetDirectory = await tx.directory.findUnique({
+                        where: { id: fileDto.directoryId }
+                    });
+                    if (!targetDirectory) {
+                        throw new BadRequestException('目标文件夹不存在');
+                    }
+                }
+
+
+
+
+
+                data.directoryId = fileDto.directoryId;
+
+                // 移动到新文件夹时，如果没有指定 sort，则自动放到最后
+                if (fileDto.sort === undefined) {
+                    const maxSortResult = await tx.file.aggregate({
+                        _max: { sort: true },
+                        where: { directoryId: fileDto.directoryId },
+                    });
+                    data.sort = (maxSortResult._max.sort ?? 0) + 1;
+                }
+            }
+
+            // 4️⃣ 处理排序（独立的排序操作）
+            if (fileDto.sort !== undefined && fileDto.directoryId === undefined) {
+                // 只在当前文件夹内调整排序
+                data.sort = fileDto.sort;
+            } else if (fileDto.sort !== undefined && fileDto.directoryId !== undefined) {
+                // 移动到新文件夹时，使用指定的 sort
+                data.sort = fileDto.sort;
+            }
+
+            // 5️⃣ 如果没有任何更新
+            if (Object.keys(data).length === 0) {
+                return originalFile;
+            }
+
+            // 6️⃣ 更新数据库
+            const updatedFile = await tx.file.update({
+                where: { id: fileId },
+                data,
+            });
+
+            // 7️⃣ 处理物理文件（重命名导致文件夹名改变）
+            if (needHandlePhysicalFile) {
+                // 检查是否有其他文件使用相同的 hash
+                const sameHashFiles = await tx.file.findMany({
+                    where: {
+                        hash: originalFile.hash,
+                        id: { not: fileId }
+                    },
+                    select: { fileName: true }
+                });
+
+                // 检查这些文件中是否有使用旧文件夹名的
+                const hasOldFolderReference = sameHashFiles.some(f =>
+                    path.parse(f.fileName).name === oldFileNameWithoutExt
+                );
+
+                // 检查是否已存在新文件夹路径的文件
+                const hasNewFolderReference = sameHashFiles.some(f =>
+                    path.parse(f.fileName).name === newFileNameWithoutExt
+                );
+
+                const oldPhysicalPath = path.join(this.UPLOAD_DIR, oldFileNameWithoutExt, originalFile.hash);
+                const newPhysicalPath = path.join(this.UPLOAD_DIR, newFileNameWithoutExt, originalFile.hash);
+
+                // 返回物理文件操作信息，在事务外执行
+                return {
+                    ...updatedFile,
+                    _physicalFileOperation: {
+                        shouldCopy: !hasNewFolderReference,
+                        shouldDeleteOld: !hasOldFolderReference,
+                        oldPath: oldPhysicalPath,
+                        newPath: newPhysicalPath
+                    }
+                };
+            }
+
+            return updatedFile;
+        }).then(async (result: any) => {
+            // 8️⃣ 在事务外处理物理文件
+            if (result._physicalFileOperation) {
+                const { shouldCopy, shouldDeleteOld, oldPath, newPath } = result._physicalFileOperation;
+
+                try {
+                    // 如果新文件夹路径不存在，复制文件过去
+                    if (shouldCopy) {
+                        await fs.ensureDir(path.dirname(newPath));
+                        await fs.copy(oldPath, newPath);
+                    }
+
+                    // 如果没有其他文件引用旧文件夹，删除旧路径的文件
+                    if (shouldDeleteOld) {
+                        await fs.remove(oldPath);
+
+                        // 检查旧文件夹是否为空，为空则删除
+                        await this.cleanupEmptyDirectory(oldPath);
+                    }
+                } catch (error) {
+                    console.error('Physical file operation failed:', error);
+                    // 物理文件操作失败，记录错误但不影响业务
+                    // 可以添加到修复队列，定时任务处理
+                }
+
+                // 删除临时的操作信息
+                delete result._physicalFileOperation;
+            }
+
+            return result;
+        });
+    }
+    async getDirectoryFiles(directoryId: string) {
+        return await this.prisma.file.findMany({
+            where: {
+                directoryId: directoryId
             }
         })
     }
-    async deleteFile(fileId: string) {
-        return await this.prisma.file.delete({
-            where: {
-                id: fileId
+    /**
+    * @Description: 清理空文件夹
+    */
+    private async cleanupEmptyDirectory(filePath: string) {
+        try {
+            const dirPath = path.dirname(filePath);
+            const files = await fs.readdir(dirPath);
+
+            if (files.length === 0) {
+                await fs.remove(dirPath);
             }
-        })
+        } catch (error) {
+            // 忽略错误
+            console.error('Failed to cleanup directory:', error);
+        }
+    }
+    async deleteDirectory(directoryId: string) {
+        if (directoryId === this.rootId) {
+            throw new BadRequestException('不能删除根目录');
+        }
+        return await this.prisma.$transaction(async (tx) => {
+            // 1️⃣ 递归查询所有子文件夹 ID
+            const result = await tx.$queryRawUnsafe<{ id: string }[]>(`
+            WITH RECURSIVE subdirs AS (
+                SELECT id FROM "Directory" WHERE id = $1
+                UNION ALL
+                SELECT d.id
+                FROM "Directory" d
+                INNER JOIN subdirs s ON d."parentId" = s.id
+            )
+            SELECT id FROM subdirs;
+        `, directoryId);
+
+            const directoryIds = result.map(item => item.id);
+
+            // 2️⃣ 批量查询所有需要删除的文件
+            const files = await tx.file.findMany({
+                where: {
+                    directoryId: { in: directoryIds }
+                },
+                select: {
+                    id: true,
+                    hash: true,
+                    fileName: true
+                }
+            });
+
+            // 3️⃣ 删除所有文件记录
+            if (files.length > 0) {
+                await tx.file.deleteMany({
+                    where: {
+                        directoryId: { in: directoryIds }
+                    }
+                });
+            }
+
+            // 4️⃣ 批量统计每个 hash 的剩余引用数
+            const hashesToCheck = [...new Set(files.map(f => f.hash))];
+            const hashCounts = await tx.file.groupBy({
+                by: ['hash'],
+                where: { hash: { in: hashesToCheck } },
+                _count: { hash: true },
+            });
+
+            const hashCountMap = new Map(
+                hashCounts.map(h => [h.hash, h._count.hash])
+            );
+
+            // 5️⃣ 批量统计每个 fileName 的剩余引用数
+            const fileNamesToCheck = [...new Set(files.map(f => f.fileName))];
+            const fileNameCounts = await tx.file.groupBy({
+                by: ['fileName'],
+                where: { fileName: { in: fileNamesToCheck } },
+                _count: { fileName: true },
+            });
+
+            const fileNameCountMap = new Map(
+                fileNameCounts.map(f => [f.fileName, f._count.fileName])
+            );
+
+            // 6️⃣ 删除物理文件和文件夹
+            const filePathsToDelete: string[] = [];
+            const dirPathsToDelete = new Set<string>();
+
+            for (const file of files) {
+                const fileNameWithoutExt = path.parse(file.fileName).name;
+
+                // 如果该 hash 没有其他引用，标记删除物理文件
+                if (!hashCountMap.has(file.hash)) {
+                    const filePath = path.join(this.UPLOAD_DIR, fileNameWithoutExt, file.hash);
+                    filePathsToDelete.push(filePath);
+                }
+
+                // 如果该 fileName 没有其他引用，标记删除文件夹
+                if (!fileNameCountMap.has(file.fileName)) {
+                    const dirPath = path.join(this.UPLOAD_DIR, fileNameWithoutExt);
+                    dirPathsToDelete.add(dirPath);
+                }
+            }
+
+            // 7️⃣ 并发删除物理文件（事务外执行，避免阻塞）
+            // 注意：这里在事务内删除是为了确保一致性
+            await Promise.allSettled([
+                ...filePathsToDelete.map(p => fs.remove(p).catch(err =>
+                    console.error(`Failed to delete file: ${p}`, err)
+                )),
+                ...Array.from(dirPathsToDelete).map(p => fs.remove(p).catch(err =>
+                    console.error(`Failed to delete directory: ${p}`, err)
+                ))
+            ]);
+
+            // 8️⃣ 批量删除文件夹记录（按层级从深到浅删除）
+            await tx.directory.deleteMany({
+                where: { id: { in: directoryIds } }
+            });
+
+            return { deletedDirectories: directoryIds.length, deletedFiles: files.length };
+        });
+    }
+    /**
+     * @Description: 更新文件夹信息（重命名/移动/排序）
+     */
+    async updateDirectory(directoryId: string, body: directoryDto) {
+        return await this.prisma.$transaction(async (tx) => {
+            // 1️⃣ 检查文件夹是否存在
+            const directory = await tx.directory.findUnique({
+                where: { id: directoryId },
+                select: {
+                    id: true,
+                    name: true,
+                    parentId: true
+                }
+            });
+
+            if (!directory) {
+                throw new BadRequestException('文件夹不存在');
+            }
+
+            const data: any = {};
+
+            // 2️⃣ 处理重命名
+            if (body.DirectoryName !== undefined && body.DirectoryName !== directory.name) {
+                // 验证文件夹名是否合法
+                if (!isValidFileName(body.DirectoryName)) {
+                    throw new BadRequestException('文件夹名不合法');
+                }
+
+                // 检查同级目录下是否已存在同名文件夹
+                const existingDirectory = await tx.directory.findFirst({
+                    where: {
+                        name: body.DirectoryName,
+                        parentId: directory.parentId,
+                        id: { not: directoryId }
+                    }
+                });
+
+                if (existingDirectory) {
+                    throw new ConflictException('同级目录下已存在同名文件夹');
+                }
+
+                data.name = body.DirectoryName;
+            }
+
+            // 3️⃣ 处理移动到其他父文件夹里面
+            if (body.parentId !== undefined && body.parentId !== directory.parentId) {
+                // 检查目标父文件夹是否存在
+                const parentDirectory = await tx.directory.findUnique({
+                    where: { id: body.parentId }
+                });
+
+                if (!parentDirectory) {
+                    throw new BadRequestException('目标父文件夹不存在');
+                }
+                let isCircular = false
+                // 检查是否会造成循环引用（不能移动到自己的子文件夹下）
+                if (directoryId === body.parentId) {
+                    isCircular = true;
+                }
+
+                // 递归查询目标父文件夹的所有祖先
+                const result = await tx.$queryRawUnsafe<{ id: string }[]>(`
+        WITH RECURSIVE ancestors AS (
+            SELECT id, "parentId" FROM "Directory" WHERE id = $1
+            UNION ALL
+            SELECT d.id, d."parentId"
+            FROM "Directory" d
+            INNER JOIN ancestors a ON d.id = a."parentId"
+        )
+        SELECT id FROM ancestors WHERE id = $2
+    `, body.parentId, directoryId);
+
+                isCircular = result.length > 0;
+
+
+                if (isCircular) {
+                    throw new BadRequestException('不能移动到自己的子文件夹下');
+                }
+
+
+                // 检查目标位置是否已存在同名文件夹
+                const targetDirectoryName = data.directoryName || directory.name;
+                const existingDirectory = await tx.directory.findFirst({
+                    where: {
+                        name: targetDirectoryName,
+                        parentId: body.parentId,
+                        id: { not: directoryId }
+                    }
+                });
+
+                if (existingDirectory) {
+                    throw new ConflictException('目标位置已存在同名文件夹');
+                }
+
+                data.parentId = body.parentId;
+
+
+            }
+
+
+
+            // 5️⃣ 如果没有任何更新
+            if (Object.keys(data).length === 0) {
+                return directory;
+            }
+
+            // 6️⃣ 更新数据库
+            return await tx.directory.update({
+                where: { id: directoryId },
+                data
+            });
+        });
     }
 }

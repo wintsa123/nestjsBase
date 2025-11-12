@@ -2,6 +2,7 @@
 import crypto from 'crypto';
 import isStream from "is-stream"
 import axios from "axios";
+import * as path from 'path';
 
 interface Obj {
   [propName: string]: any
@@ -133,9 +134,24 @@ export const transformedResult = (data) => data.map(row => {
  * @Description: bBigInt转换
  * @returns {*} 
  */
-export const BigIntreplacer=(obj) => {
+export const BigIntreplacer = (obj) => {
   return JSON.parse(JSON.stringify(
     obj,
     (_key, value) => (typeof value === 'bigint' ? value.toString() : value) // return everything else unchanged
   ))
+}
+/**
+   * @Description: 验证文件名是否合法
+   */
+export const isValidFileName = (fileName: string): boolean => {
+  // 禁止的字符
+  const invalidChars = /[<>:"/\\|?*\x00-\x1F]/;
+
+  // 禁止的文件名
+  const reservedNames = /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i;
+
+  return !invalidChars.test(fileName) &&
+    !reservedNames.test(path.parse(fileName).name) &&
+    fileName.length > 0 &&
+    fileName.length <= 255;
 }

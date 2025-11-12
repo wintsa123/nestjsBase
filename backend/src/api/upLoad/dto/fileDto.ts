@@ -1,17 +1,17 @@
 import { PartialType, ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
-export class directoryDto extends PartialType(class { }) {
+export class fileDto extends PartialType(class { }) {
 
 
 
   @ApiProperty({ required: false })
-  @IsNotEmpty({ message: '目录ID不能为空' })
+  fileId?: string;
+  @ApiProperty({ required: false })
+  fileName!: string;
+@ApiProperty({ required: false })
+  sort!: number;
+  @ApiProperty({ required: false })
   directoryId!: string;
-  @ApiProperty({ required: false })
-  DirectoryName!: string;
-  @ApiProperty({ required: false })
-  parentId!: string;
-
 
 }
 

@@ -8,13 +8,15 @@ import {
   Delete,
   Param,
   UploadedFile,
-  Put
+  Put,
+  Get
 } from '@nestjs/common';
 import { FileInterceptor, MulterFile } from '@webundsoehne/nest-fastify-file-upload';
 
 import { UploadService } from './upload.service';
 import { ApiOperation } from '@nestjs/swagger';
 import { directoryDto } from './dto/directoryDto';
+import { fileDto } from './dto/fileDto';
 
 @Controller('upload')
 export class UploadController {
@@ -144,18 +146,18 @@ export class UploadController {
    * 小文件直接上传接口
    * POST /upload/small
    */
-  @ApiOperation({ summary: 'addType' })
+  @ApiOperation({ summary: 'addDirectory' })
 
-  @Post('addType')
-  async addType(
+  @Post('addDirectory')
+  async addDirectory(
     @Body() body: directoryDto
   ) {
-    const { directoryId, TypeName } = body;
+    const { directoryId, DirectoryName } = body;
 
-    return await this.uploadService.addType(
+    return await this.uploadService.addDirectory(
 
       directoryId,
-      TypeName
+      DirectoryName
     );
   }
   
@@ -175,18 +177,11 @@ export class UploadController {
   @ApiOperation({ summary: 'updateFile' })
   @Put('updateFile/:fileId')
   async updateFile(
-    @Param('fileId') fileId: string,
-    @Body() body: {
-      fileName?: string;
-      fileSize?: number;
-      blake3Hash?: string;
-      directoryId?: string;
-      uploaderId?: string;
-      isDuplicate?: boolean;
-    }
+        @Param('fileId') fileId: string,
+
+    @Body() body: fileDto
   ) {
-    return await this.uploadService.updateFile(
-      fileId,
+    return await this.uploadService.updateFile(fileId,
       body
     );
   }
@@ -195,13 +190,22 @@ export class UploadController {
   @Put('updateDirectory/:directoryId')
   async updateDirectory(
     @Param('directoryId') directoryId: string,
-    @Body() body: {
-      directoryName?: string;
-    }
+    @Body() body: directoryDto
   ) {
     return await this.uploadService.updateDirectory(
       directoryId,
       body
+    );
+  }
+
+  //获取文件夹下的文件和目录
+  @ApiOperation({ summary: 'getDirectoryFiles' })
+  @Get('getDirectoryFiles/:directoryId')
+  async getDirectoryFiles(
+    @Param('directoryId') directoryId: string
+  ) {
+    return await this.uploadService.getDirectoryFiles(
+      directoryId
     );
   }
 }

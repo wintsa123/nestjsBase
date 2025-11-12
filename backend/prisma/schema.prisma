@@ -59,7 +59,7 @@ model File {
   fileName      String                          // 文件名（如 report.pdf）
   fileType      String?                         // 文件类型（pdf, docx, txt...）
   fileSize      Int
-  hash       String?                   // 文件内容hash（用于去重）
+  hash       String                   // 文件内容hash（用于去重）
   uploaderId    String?                          // 上传人ID（可与用户表关联）
   text          Text?      @relation("FileText")  // ✅ 可选反向引用
   createdAt     DateTime @default(now())
