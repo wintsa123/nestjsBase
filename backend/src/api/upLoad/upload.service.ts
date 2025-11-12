@@ -4,18 +4,17 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { pipeline } from 'stream/promises';
 import { createWriteStream, createReadStream } from 'fs';
-import * as libre from 'libreoffice-convert';
+import { LibreOfficeFileConverter } from 'libreoffice-file-converter';
 import { promisify } from 'util';
 import { PrismaService } from '@src/plugin/prisma/prisma.service';
 import { blake3 } from 'hash-wasm';
 
-const convertAsync = promisify(libre.convert);
 
 @Injectable()
 export class UploadService {
     private readonly UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
-    private readonly CHUNK_SIZE = 50 * 1024 * 1024; // 5MB 切片大小
-    private readonly SMALL_FILE_THRESHOLD = 100 * 1024 * 1024; // 10MB 以下直接上传
+    private readonly CHUNK_SIZE = 50 * 1024 * 1024; // 50MB 切片大小
+    private readonly SMALL_FILE_THRESHOLD = 100 * 1024 * 1024; // 100MB 以下直接上传
 
     // 临时存储分片上传的信息
     private uploadSessions = new Map<string, {
@@ -78,11 +77,20 @@ export class UploadService {
     /**
      * 将 Word 文档转换为 PDF
      */
-    private async convertWordToPdf(inputPath: string): Promise<string> {
+    private async convertWordToPdf(file: Buffer, inputPath: string): Promise<string> {
         try {
-            const docxBuffer = await fs.readFile(inputPath);
-            const pdfBuffer = await convertAsync(docxBuffer, '.pdf', undefined);
-
+            const libreOfficeFileConverter = new LibreOfficeFileConverter({
+                childProcessOptions: {
+                    timeout: 60 * 1000,
+                },
+            });
+            const pdfBuffer = await libreOfficeFileConverter.convert({
+                buffer: file,
+                format: 'pdf',
+                input: 'buffer',
+                output: 'buffer'
+            })
+            console.log(pdfBuffer)
             const pdfPath = inputPath.replace(/\.(docx?|doc)$/i, '.pdf');
             await fs.writeFile(pdfPath, pdfBuffer);
 
@@ -127,6 +135,9 @@ export class UploadService {
         const existingFile = await this.checkFileExists(blake3Hash);
         if (existingFile) {
             // 文件已存在，直接复用
+            if (existingFile.directoryId == directoryId) {
+                throw new BadRequestException('文件已存在于该目录');
+            }
             return await this.createFileRecord(
                 existingFile.fileName,
                 existingFile.fileType as string,
@@ -146,13 +157,13 @@ export class UploadService {
         const filePath = this.getFilePath(finalFileName, blake3Hash);
         await fs.ensureDir(path.dirname(filePath));
 
-        const tempPath = path.join(this.UPLOAD_DIR, 'temp', `${blake3Hash}_temp${ext}`);
+        const tempPath = path.join(this.UPLOAD_DIR, 'temp', `${blake3Hash}_${fileName}`);
         await fs.writeFile(tempPath, file);
 
         // 如果是 Word 文件，转换为 PDF
         let finalPath = tempPath;
         if (ext === '.docx' || ext === '.doc') {
-            finalPath = await this.convertWordToPdf(tempPath);
+            finalPath = await this.convertWordToPdf(file, finalPath);
         }
 
         // 移动到最终位置
@@ -285,7 +296,8 @@ export class UploadService {
             : session.fileName;
 
         if (ext === '.docx' || ext === '.doc') {
-            finalPath = await this.convertWordToPdf(mergedPath);
+            const file = await fs.readFile(mergedPath)
+            finalPath = await this.convertWordToPdf(file, mergedPath);
         }
 
         // 移动到最终位置
@@ -323,6 +335,12 @@ export class UploadService {
         uploaderId?: string,
         isDuplicate: boolean = false
     ) {
+        const maxSortResult = await this.prisma.file.aggregate({
+    _max: { sort: true },
+    where: { directoryId: directoryId ?? null },
+  });
+
+  const nextSort = (maxSortResult._max.sort ?? 0) + 1;
         // 如果是重复文件，创建新的文件记录但指向同一个物理文件
         const file = await this.prisma.file.create({
             data: {
@@ -331,7 +349,8 @@ export class UploadService {
                 fileSize,
                 hash: blake3Hash, // 重复文件不设置blake3Hash（避免唯一约束）
                 directoryId,
-                uploaderId
+                uploaderId,
+                sort: nextSort
             },
             include: {
                 directory: true
@@ -355,5 +374,21 @@ export class UploadService {
             this.uploadSessions.delete(sessionId);
         }
         return { message: '上传已取消' };
+    }
+    async addType(directoryId: string, TypeName: string) {
+        return await this.prisma.directory.create({
+
+            data: {
+                parentId: directoryId,
+                name: TypeName
+            }
+        })
+    }
+    async deleteFile(fileId: string) {
+        return await this.prisma.file.delete({
+            where: {
+                id: fileId
+            }
+        })
     }
 }

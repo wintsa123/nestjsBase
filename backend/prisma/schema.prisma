@@ -64,6 +64,7 @@ model File {
   text          Text?      @relation("FileText")  // ✅ 可选反向引用
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  sort          Int
 
 }
 model Text{
