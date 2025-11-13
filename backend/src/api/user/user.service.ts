@@ -189,6 +189,7 @@ export class userService {
     let userInfo
     try {
       payload = this.jwtService.verify(refreshToken, { secret: process.env.JWT_refreshSECRET || 'wintsa_refresh' });
+      console.log(payload, 'payload')
        userInfo = await this.pgService.user.findUnique({
         select: {      
           phone: true,
@@ -196,6 +197,8 @@ export class userService {
         },
         where: { id: payload.sub },  // 根据 sub（用户 ID）查询用户
       });
+            console.log(userInfo, 'userInfo')
+
   
     } catch (error) {
       console.log(error, 'error')

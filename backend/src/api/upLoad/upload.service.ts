@@ -11,14 +11,14 @@ import { blake3 } from 'hash-wasm';
 
 import { fileDto } from './dto/fileDto';
 import { isValidFileName } from '@src/utils';
-import { directoryDto } from './dto/directoryDto';
+import { DirectoryDto } from './dto/directoryDto';
 
 @Injectable()
 export class UploadService {
     private readonly UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
     private readonly CHUNK_SIZE = 50 * 1024 * 1024; // 50MB 切片大小
     private readonly SMALL_FILE_THRESHOLD = 100 * 1024 * 1024; // 100MB 以下直接上传
-    private rootId?: string;
+    private rootId: string | null = null;
     // 临时存储分片上传的信息
     private uploadSessions = new Map<string, {
         fileName: string;
@@ -44,7 +44,7 @@ export class UploadService {
         if (!root) {
             const result = await this.prisma.directory.create({
                 data: {
-                    name: '/',
+                    name: '根目录',
                     parentId: null, // 根目录没有上级
                 },
             });
@@ -161,7 +161,7 @@ export class UploadService {
                 throw new BadRequestException('文件已存在于该目录');
             }
             return await this.createFileRecord(
-                existingFile.fileName,
+                existingFile.name,
                 existingFile.fileType as string,
                 existingFile.fileSize,
                 blake3Hash,
@@ -300,7 +300,7 @@ export class UploadService {
             this.uploadSessions.delete(sessionId);
 
             return await this.createFileRecord(
-                existingFile.fileName,
+                existingFile.name,
                 existingFile.fileType as string,
                 existingFile.fileSize,
                 blake3Hash,
@@ -349,7 +349,7 @@ export class UploadService {
      * 创建文件记录
      */
     private async createFileRecord(
-        fileName: string,
+        name: string,
         fileType: string,
         fileSize: number,
         blake3Hash: string,
@@ -366,7 +366,7 @@ export class UploadService {
         // 如果是重复文件，创建新的文件记录但指向同一个物理文件
         const file = await this.prisma.file.create({
             data: {
-                fileName,
+                name,
                 fileType,
                 fileSize,
                 hash: blake3Hash, // 重复文件不设置blake3Hash（避免唯一约束）
@@ -397,8 +397,14 @@ export class UploadService {
         }
         return { message: '上传已取消' };
     }
-    async addDirectory(directoryId: string, DirectoryName: string) {
+    async addDirectory(directoryId: string | null | undefined, DirectoryName: string) {
         return await this.prisma.$transaction(async (tx) => {
+            if (!directoryId) {
+                directoryId = this.rootId
+            }
+            if (!isValidFileName(DirectoryName)) {
+                throw new BadRequestException('文件夹名不合法');
+            }
             const existingDirectory = await tx.directory.findFirst({
                 where: {
                     name: DirectoryName,
@@ -409,6 +415,7 @@ export class UploadService {
             if (existingDirectory) {
                 throw new ConflictException('目标位置已存在同名文件夹');
             }
+
             return await this.prisma.directory.create({
 
                 data: {
@@ -431,7 +438,7 @@ export class UploadService {
             // 1️⃣ 查出文件信息
             const file = await tx.file.findUnique({
                 where: { id: fileId },
-                select: { hash: true, fileName: true },
+                select: { hash: true, name: true },
             });
 
             if (!file) throw new BadRequestException('文件不存在');
@@ -448,7 +455,7 @@ export class UploadService {
 
             // 4️⃣ 如果没有其他文件使用该 hash，删除物理文件
             if (hashCount === 0) {
-                const fileNameWithoutExt = path.parse(file.fileName).name;
+                const fileNameWithoutExt = path.parse(file.name).name;
                 const filePath = path.join(this.UPLOAD_DIR, fileNameWithoutExt, file.hash);
 
                 try {
@@ -460,7 +467,7 @@ export class UploadService {
 
                 // 5️⃣ 检查文件夹是否还有其他文件
                 const fileNameCount = await tx.file.count({
-                    where: { fileName: file.fileName },
+                    where: { name: file.name },
                 });
 
                 // 6️⃣ 如果文件夹为空，删除文件夹
@@ -489,7 +496,7 @@ export class UploadService {
                 where: { id: fileId },
                 select: {
                     id: true,
-                    fileName: true,
+                    name: true,
                     hash: true,
                     directoryId: true,
                     sort: true,
@@ -506,7 +513,7 @@ export class UploadService {
             let newFileNameWithoutExt = '';
 
             // 2️⃣ 处理重命名
-            if (fileDto.fileName !== undefined && fileDto.fileName !== originalFile.fileName) {
+            if (fileDto.fileName !== undefined && fileDto.fileName !== originalFile.name) {
                 // 检查新文件名是否合法
                 if (!isValidFileName(fileDto.fileName)) {
                     throw new BadRequestException('文件名不合法');
@@ -517,14 +524,14 @@ export class UploadService {
 
 
                 // 检查文件夹名称是否改变
-                oldFileNameWithoutExt = path.parse(originalFile.fileName).name;
+                oldFileNameWithoutExt = path.parse(originalFile.name).name;
                 newFileNameWithoutExt = path.parse(fileDto.fileName).name;
 
                 if (oldFileNameWithoutExt !== newFileNameWithoutExt) {
                     needHandlePhysicalFile = true;
                 }
 
-                data.fileName = fileDto.fileName;
+                data.name = fileDto.fileName;
             }
 
             // 3️⃣ 处理移动到其他文件夹
@@ -583,17 +590,17 @@ export class UploadService {
                         hash: originalFile.hash,
                         id: { not: fileId }
                     },
-                    select: { fileName: true }
+                    select: { name: true }
                 });
 
                 // 检查这些文件中是否有使用旧文件夹名的
                 const hasOldFolderReference = sameHashFiles.some(f =>
-                    path.parse(f.fileName).name === oldFileNameWithoutExt
+                    path.parse(f.name).name === oldFileNameWithoutExt
                 );
 
                 // 检查是否已存在新文件夹路径的文件
                 const hasNewFolderReference = sameHashFiles.some(f =>
-                    path.parse(f.fileName).name === newFileNameWithoutExt
+                    path.parse(f.name).name === newFileNameWithoutExt
                 );
 
                 const oldPhysicalPath = path.join(this.UPLOAD_DIR, oldFileNameWithoutExt, originalFile.hash);
@@ -644,12 +651,39 @@ export class UploadService {
             return result;
         });
     }
-    async getDirectoryFiles(directoryId: string) {
-        return await this.prisma.file.findMany({
+    async getDirectoryFiles(directoryId: string | null | undefined) {
+        if (!directoryId) {
+            directoryId = this.rootId as string;
+        }
+        const data = await this.prisma.directory.findMany({
             where: {
-                directoryId: directoryId
+                id: directoryId
+            },
+
+            select: {
+                id: true,
+
+                name: true,
+                files: {
+                    select: {
+                        id: true,
+                        name: true,
+                        sort: true,
+                        fileSize: true
+                    }
+                },
+                subDirs: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
             }
+
+
         })
+        return data?.[0] || [];
+
     }
     /**
     * @Description: 清理空文件夹
@@ -694,7 +728,7 @@ export class UploadService {
                 select: {
                     id: true,
                     hash: true,
-                    fileName: true
+                    name: true
                 }
             });
 
@@ -720,15 +754,15 @@ export class UploadService {
             );
 
             // 5️⃣ 批量统计每个 fileName 的剩余引用数
-            const fileNamesToCheck = [...new Set(files.map(f => f.fileName))];
+            const fileNamesToCheck = [...new Set(files.map(f => f.name))];
             const fileNameCounts = await tx.file.groupBy({
-                by: ['fileName'],
-                where: { fileName: { in: fileNamesToCheck } },
-                _count: { fileName: true },
+                by: ['name'],
+                where: { name: { in: fileNamesToCheck } },
+                _count: { name: true },
             });
 
             const fileNameCountMap = new Map(
-                fileNameCounts.map(f => [f.fileName, f._count.fileName])
+                fileNameCounts.map(f => [f.name, f._count.name])
             );
 
             // 6️⃣ 删除物理文件和文件夹
@@ -736,7 +770,7 @@ export class UploadService {
             const dirPathsToDelete = new Set<string>();
 
             for (const file of files) {
-                const fileNameWithoutExt = path.parse(file.fileName).name;
+                const fileNameWithoutExt = path.parse(file.name).name;
 
                 // 如果该 hash 没有其他引用，标记删除物理文件
                 if (!hashCountMap.has(file.hash)) {
@@ -744,8 +778,8 @@ export class UploadService {
                     filePathsToDelete.push(filePath);
                 }
 
-                // 如果该 fileName 没有其他引用，标记删除文件夹
-                if (!fileNameCountMap.has(file.fileName)) {
+                // 如果该 name 没有其他引用，标记删除文件夹
+                if (!fileNameCountMap.has(file.name)) {
                     const dirPath = path.join(this.UPLOAD_DIR, fileNameWithoutExt);
                     dirPathsToDelete.add(dirPath);
                 }
@@ -773,7 +807,7 @@ export class UploadService {
     /**
      * @Description: 更新文件夹信息（重命名/移动/排序）
      */
-    async updateDirectory(directoryId: string, body: directoryDto) {
+    async updateDirectory(directoryId: string, body: DirectoryDto) {
         return await this.prisma.$transaction(async (tx) => {
             // 1️⃣ 检查文件夹是否存在
             const directory = await tx.directory.findUnique({
@@ -792,16 +826,16 @@ export class UploadService {
             const data: any = {};
 
             // 2️⃣ 处理重命名
-            if (body.DirectoryName !== undefined && body.DirectoryName !== directory.name) {
+            if (body.directoryName !== undefined && body.directoryName !== directory.name) {
                 // 验证文件夹名是否合法
-                if (!isValidFileName(body.DirectoryName)) {
+                if (!isValidFileName(body.directoryName)) {
                     throw new BadRequestException('文件夹名不合法');
                 }
 
                 // 检查同级目录下是否已存在同名文件夹
                 const existingDirectory = await tx.directory.findFirst({
                     where: {
-                        name: body.DirectoryName,
+                        name: body.directoryName,
                         parentId: directory.parentId,
                         id: { not: directoryId }
                     }
@@ -811,7 +845,7 @@ export class UploadService {
                     throw new ConflictException('同级目录下已存在同名文件夹');
                 }
 
-                data.name = body.DirectoryName;
+                data.name = body.directoryName;
             }
 
             // 3️⃣ 处理移动到其他父文件夹里面

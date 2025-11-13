@@ -9,186 +9,165 @@
             <el-radio-button label="grid">平铺模式</el-radio-button>
           </el-radio-group>
           <el-button type="primary" @click="handleCreateFolder">
-            <el-icon><FolderAdd /></el-icon>
+            <el-icon>
+              <FolderAdd />
+            </el-icon>
             新建文件夹
           </el-button>
         </div>
       </div>
-      
+
       <!-- 面包屑导航 -->
       <div class="breadcrumb-area">
         <el-breadcrumb separator="/">
           <el-breadcrumb-item @click="navigateToPath(0)" class="breadcrumb-clickable">
-            <el-icon><HomeFilled /></el-icon>
-            根目录
+            <div class="breadcrumb-home"> <el-icon>
+                <HomeFilled />
+              </el-icon><span v-if="currentPath.length > 0">{{ currentPath[0].name }}</span></div>
+
           </el-breadcrumb-item>
-          <el-breadcrumb-item 
-            v-for="(item, index) in currentPath" 
-            :key="index"
-            @click="navigateToPath(index + 1)"
-            :class="{ 'breadcrumb-clickable': index < currentPath.length - 1 }"
-          >
+          <el-breadcrumb-item v-for="(item, index) in currentPath.slice(1)" :key="index"
+            @click="index + 1 < currentPath.length - 1 && navigateToPath(index + 1)"
+            :class="{ 'breadcrumb-clickable': index < currentPath.length - 1 }">
             {{ item.name }}
           </el-breadcrumb-item>
+
         </el-breadcrumb>
       </div>
     </div>
 
     <!-- 列表模式 -->
-    <div v-if="viewMode === 'list'" class="list-view" @contextmenu.prevent="handleEmptyContextMenu">
-      <VueDraggable
-        v-model="files"
-        ghostClass="ghost"
-         :animation="150"
-        @start="onDragStart"
-        @end="onDragEnd"
-        @update="onDragChange"
-      >
-        <div
-          v-for="item in files"
-          :key="item.id"
-          @contextmenu.prevent="handleContextMenu($event, item)"
-          @dblclick="handleOpen(item)"
-          :class="['file-item', { 'drag-over-folder': dragOverFolder?.id === item.id }]"
-       
-        >
-          <div class="file-content">
-            <div class="drag-handle">
-              <el-icon :size="20" style="cursor: move; color: #9ca3af;">
+    <div v-if="directoryFiles && directoryFiles.sub.length > 0">
+      <div v-if="viewMode === 'list'" class="list-view" @contextmenu.prevent="handleEmptyContextMenu">
+        <VueDraggable v-model="directoryFiles.sub" ghostClass="ghost" :animation="150" @start="onDragStart"
+          @end="onDragEnd" @update="onDragChange">
+          <div v-for="item in directoryFiles.sub" :key="item.id" @contextmenu.prevent="handleContextMenu($event, item)"
+            @dblclick="handleOpen(item)" :class="['file-item', { 'drag-over-folder': dragOverFolder?.id === item.id }]">
+            <div class="file-content">
+              <div class="drag-handle">
+                <el-icon :size="20" style="cursor: move; color: #9ca3af;">
+                  <Rank />
+                </el-icon>
+              </div>
+
+              <el-icon :size="24" :color="item.type === 'directory' ? '#f59e0b' : '#3b82f6'">
+                <Folder v-if="item.type === 'directory'" />
+                <Document v-else />
+              </el-icon>
+
+              <el-input v-if="editingId === item.id" v-model="editingName" ref="editInput" @blur="confirmRename"
+                @keyup.enter="confirmRename" @keyup.esc="editingId = null" size="small" class="rename-input" />
+              <span v-else class="file-name">{{ item.name }}</span>
+
+            </div>
+
+
+          </div>
+        </VueDraggable>
+      </div>
+
+      <!-- 平铺模式 -->
+      <div v-else class="grid-view" @contextmenu.prevent="handleEmptyContextMenu">
+        <VueDraggable v-model="directoryFiles.sub" ghostClass="ghost" class="grid-container" :animation="300"
+          @start="onDragStart" @end="onDragEnd" @update="onDragChange">
+          <div v-for="item in directoryFiles.sub" :key="item.id" @contextmenu.prevent="handleContextMenu($event, item)"
+            @dblclick="handleOpen(item)" :class="['grid-item', { 'drag-over-folder': dragOverFolder?.id === item.id }]">
+            <div class="grid-drag-handle">
+              <el-icon :size="16" style="cursor: move; color: #9ca3af;">
                 <Rank />
               </el-icon>
             </div>
-            
-            <el-icon :size="24" :color="item.type === 'folder' ? '#f59e0b' : '#3b82f6'">
-              <Folder v-if="item.type === 'folder'" />
-              <Document v-else />
-            </el-icon>
-            
-            <el-input
-              v-if="editingId === item.id"
-              v-model="editingName"
-              ref="editInput"
-              @blur="confirmRename"
-              @keyup.enter="confirmRename"
-              @keyup.esc="editingId = null"
-              size="small"
-              class="rename-input"
-            />
-            <span v-else class="file-name">{{ item.name }}</span>
-            
-            <span class="sort-order">#{{ item.sortOrder }}</span>
-          </div>
 
-          
-        </div>
-      </VueDraggable>
+            <div class="grid-icon">
+              <el-icon :size="64" :color="item.type === 'directory' ? '#f59e0b' : '#3b82f6'">
+                <Folder v-if="item.type === 'directory'" />
+                <Document v-else />
+              </el-icon>
+            </div>
+
+            <el-input v-if="editingId === item.id" v-model="editingName" ref="editInput" @blur="confirmRename"
+              @keyup.enter="confirmRename" @keyup.esc="editingId = null" size="small" class="grid-rename-input" />
+            <div v-else class="grid-name">{{ item.name }}</div>
+          </div>
+        </VueDraggable>
+      </div>
     </div>
 
-    <!-- 平铺模式 -->
-    <div v-else class="grid-view" @contextmenu.prevent="handleEmptyContextMenu">
-      <VueDraggable
-        v-model="files"
-        ghostClass="ghost"
-        class="grid-container"
-        :animation="300"
-        @start="onDragStart"
-        @end="onDragEnd"
-        @update="onDragChange"
-      >
-        <div
-          v-for="item in files"
-          :key="item.id"
-          @contextmenu.prevent="handleContextMenu($event, item)"
-          @dblclick="handleOpen(item)"
-          :class="['grid-item', { 'drag-over-folder': dragOverFolder?.id === item.id }]"
-         
-        >
-          <div class="grid-drag-handle">
-            <el-icon :size="16" style="cursor: move; color: #9ca3af;">
-              <Rank />
-            </el-icon>
-          </div>
-          
-          <div class="grid-icon">
-            <el-icon :size="64" :color="item.type === 'folder' ? '#f59e0b' : '#3b82f6'">
-              <Folder v-if="item.type === 'folder'" />
-              <Document v-else />
-            </el-icon>
-            <span class="grid-sort-order">#{{ item.sortOrder }}</span>
-          </div>
-          
-          <el-input
-            v-if="editingId === item.id"
-            v-model="editingName"
-            ref="editInput"
-            @blur="confirmRename"
-            @keyup.enter="confirmRename"
-            @keyup.esc="editingId = null"
-            size="small"
-            class="grid-rename-input"
-          />
-          <div v-else class="grid-name">{{ item.name }}</div>
-        </div>
-      </VueDraggable>
-    </div>
 
     <!-- 右键菜单 -->
-    <div
-      v-if="contextMenu.show"
-      class="context-menu"
-      :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
-      @click.stop
-    >
+    <div v-if="contextMenu.show" class="context-menu" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
+      @click.stop>
       <!-- 空白区域右键菜单 -->
       <template v-if="!contextMenu.item">
         <div class="menu-item" :class="{ disabled: !clipboard }" @click="handlePaste">
-          <el-icon><DocumentCopy /></el-icon>
+          <el-icon>
+            <DocumentCopy />
+          </el-icon>
           <span>粘贴</span>
         </div>
         <div class="menu-item" @click="handleCreateFolder">
-          <el-icon><FolderAdd /></el-icon>
+          <el-icon>
+            <FolderAdd />
+          </el-icon>
           <span>新建文件夹</span>
         </div>
-         <div class="menu-item" @click="handleCreateFolder">
-          <el-icon><FolderAdd /></el-icon>
+        <div class="menu-item" @click="handleCreateFolder">
+          <el-icon>
+            <FolderAdd />
+          </el-icon>
           <span>上传文件</span>
         </div>
       </template>
-      
+
       <!-- 文件/文件夹右键菜单 -->
       <template v-else>
         <div class="menu-item" @click="handleOpen(contextMenu.item)">
-          <el-icon><View /></el-icon>
+          <el-icon>
+            <View />
+          </el-icon>
           <span>打开</span>
         </div>
         <div class="menu-item" @click="handleRename(contextMenu.item)">
-          <el-icon><Edit /></el-icon>
+          <el-icon>
+            <Edit />
+          </el-icon>
           <span>重命名</span>
         </div>
         <div class="menu-item" @click="handleSetSortOrder(contextMenu.item)">
-          <el-icon><Sort /></el-icon>
+          <el-icon>
+            <Sort />
+          </el-icon>
           <span>设置排序号</span>
         </div>
         <el-divider style="margin: 4px 0" />
         <div class="menu-item" @click="handleCopy(contextMenu.item)">
-          <el-icon><CopyDocument /></el-icon>
+          <el-icon>
+            <CopyDocument />
+          </el-icon>
           <span>复制</span>
         </div>
         <div class="menu-item" @click="handleCut(contextMenu.item)">
-          <el-icon><ScissorIcon /></el-icon>
-          <span>剪切</span>
+          <el-icon>
+            <Scissor />
+          </el-icon> <span>剪切</span>
         </div>
         <div class="menu-item" :class="{ disabled: !clipboard }" @click="handlePaste">
-          <el-icon><DocumentCopy /></el-icon>
+          <el-icon>
+            <DocumentCopy />
+          </el-icon>
           <span>粘贴</span>
         </div>
         <div class="menu-item" @click="handleCreateFolder">
-          <el-icon><FolderAdd /></el-icon>
+          <el-icon>
+            <FolderAdd />
+          </el-icon>
           <span>新建文件夹</span>
         </div>
         <el-divider style="margin: 4px 0" />
         <div class="menu-item danger" @click="handleDelete(contextMenu.item)">
-          <el-icon><Delete /></el-icon>
+          <el-icon>
+            <Delete />
+          </el-icon>
           <span>删除</span>
         </div>
       </template>
@@ -199,13 +178,14 @@
 <script setup>
 import { ref, computed, nextTick, watch } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
-import { 
-  Folder, 
-  Document, 
-  MoreFilled, 
-  FolderAdd, 
-  Edit, 
-  Delete, 
+import {
+  Folder,
+  Scissor,
+  Document,
+  MoreFilled,
+  FolderAdd,
+  Edit,
+  Delete,
   View,
   CopyDocument,
   DocumentCopy,
@@ -214,18 +194,30 @@ import {
   Rank
 } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-
-// 自定义剪刀图标组件
-const ScissorIcon = {
-  template: `<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-    <path fill="currentColor" d="M256 832c-53 0-96-43-96-96s43-96 96-96 96 43 96 96-43 96-96 96zm0-160c-35.3 0-64 28.7-64 64s28.7 64 64 64 64-28.7 64-64-28.7-64-64-64zm0-384c-53 0-96-43-96-96s43-96 96-96 96 43 96 96-43 96-96 96zm0-160c-35.3 0-64 28.7-64 64s28.7 64 64 64 64-28.7 64-64-28.7-64-64-64zm533.1 353.1l-232-232 54.6-54.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-77.3 77.3-77.3-77.3c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l54.6 54.6-232 232c-12.5 12.5-12.5 32.8 0 45.3 6.2 6.2 14.4 9.4 22.6 9.4s16.4-3.1 22.6-9.4L480 562.7l232 232c6.2 6.2 14.4 9.4 22.6 9.4s16.4-3.1 22.6-9.4c12.6-12.6 12.6-32.8.9-45.4z"/>
-  </svg>`
-};
-
-const viewMode = ref('list');
-
+import { directoryInfo } from "@/api/fileManager/file";
 // 当前路径 - 用于面包屑导航
 const currentPath = ref([]);
+const { send: getDirectoryFiles, data: directoryFiles, onSuccess } = useRequest(directoryInfo);
+
+
+onSuccess((data) => {
+  const newItem = { id: data.data.id, name: data.data.name }
+
+  const existingIndex = currentPath.value.findIndex(
+    (item) => item.id === newItem.id
+  )
+
+  if (existingIndex === -1) {
+    // 不存在 => 前进（push）
+    currentPath.value.push(newItem)
+  } else {
+    // 已存在 => 回退（截断到当前位置）
+    currentPath.value = currentPath.value.slice(0, existingIndex + 1)
+  }
+})
+const viewMode = ref('list');
+
+
 
 // 所有文件数据（模拟根目录和子目录）
 const allFiles = ref({
@@ -276,18 +268,9 @@ const getCurrentPathString = () => {
 
 // 导航到指定路径
 const navigateToPath = (index) => {
-  if (index === 0) {
-    // 返回根目录
-    currentPath.value = [];
-    files.value = [...allFiles.value['/']];
-  } else {
-    // 返回到某个上级目录
-    currentPath.value = currentPath.value.slice(0, index);
-    const pathString = getCurrentPathString();
-    files.value = [...(allFiles.value[pathString] || [])];
-  }
+  const currentNode = currentPath.value[index]
   // TODO: 调用API加载对应路径的文件
-  console.log('导航到路径:', getCurrentPathString());
+  getDirectoryFiles(currentNode.id)
 };
 
 const closeContextMenu = () => {
@@ -299,7 +282,7 @@ const handleEmptyContextMenu = (e) => {
   // 检查是否点击在文件项上
   const target = e.target;
   const isFileItem = target.closest('.file-item') || target.closest('.grid-item');
-  
+
   if (!isFileItem) {
     contextMenu.value = {
       show: true,
@@ -370,20 +353,13 @@ const handleDelete = async (item) => {
 };
 
 const handleOpen = (item) => {
-  if (item.type === 'folder') {
+  if (item.type === 'directory') {
     // 进入文件夹
-    currentPath.value.push({ id: item.id, name: item.name });
-    const pathString = getCurrentPathString();
-    
-    // 加载文件夹内容
-    if (allFiles.value[pathString]) {
-      files.value = [...allFiles.value[pathString]];
-    } else {
-      files.value = [];
-    }
-    
+    getDirectoryFiles(item.id)
+
+
     // TODO: 调用API加载文件夹内容
-    console.log('打开文件夹:', item, '路径:', pathString);
+    console.log('打开文件夹:', item);
   } else {
     // TODO: 打开文件
     console.log('打开文件:', item, '路径:', getCurrentPathString());
@@ -442,17 +418,17 @@ const handleSetSortOrder = async (item) => {
       inputPattern: /^\d+$/,
       inputErrorMessage: '请输入有效的数字',
     });
-    
+
     if (value) {
       const newOrder = parseInt(value);
       const currentIndex = files.value.findIndex(f => f.id === item.id);
-      
+
       if (currentIndex !== -1) {
         // 移除当前项
         const [movedItem] = files.value.splice(currentIndex, 1);
         // 插入到新位置
         files.value.splice(newOrder - 1, 0, movedItem);
-        
+
         // TODO: 调用设置排序API
         console.log('设置排序:', item.id, value, '路径:', getCurrentPathString());
         ElMessage.success('排序设置成功');
@@ -474,7 +450,7 @@ const onDragEnd = (evt) => {
   console.log('拖拽结束');
   draggedItem.value = null;
   dragOverFolder.value = null;
-  
+
   // 清除定时器
   if (dragEnterTimer.value) {
     clearTimeout(dragEnterTimer.value);
@@ -493,27 +469,23 @@ const handleDragEnterFolder = (e, item) => {
   if (!draggedItem.value || draggedItem.value.id === item.id || item.type !== 'folder') {
     return;
   }
-  
+
   e.preventDefault();
   dragOverFolder.value = item;
-  
+
   // 清除之前的定时器
   if (dragEnterTimer.value) {
     clearTimeout(dragEnterTimer.value);
   }
-  
-  // 悬停 800ms 后自动打开文件夹
-  dragEnterTimer.value = setTimeout(() => {
-    console.log('自动打开文件夹:', item.name);
-    handleOpen(item);
-  }, 800);
+
+
 };
 
 const handleDragLeaveFolder = (e, item) => {
   if (dragOverFolder.value?.id === item.id) {
     dragOverFolder.value = null;
   }
-  
+
   // 清除定时器
   if (dragEnterTimer.value) {
     clearTimeout(dragEnterTimer.value);
@@ -524,23 +496,23 @@ const handleDragLeaveFolder = (e, item) => {
 const handleDropIntoFolder = (e, item) => {
   e.preventDefault();
   e.stopPropagation();
-  
+
   // 清除定时器
   if (dragEnterTimer.value) {
     clearTimeout(dragEnterTimer.value);
     dragEnterTimer.value = null;
   }
-  
+
   if (draggedItem.value && item.type === 'folder' && draggedItem.value.id !== item.id) {
     // TODO: 调用移动到文件夹API
     console.log('移动文件到文件夹:', draggedItem.value, '→', item);
-    
+
     // 从当前列表移除
     files.value = files.value.filter(f => f.id !== draggedItem.value.id);
-    
+
     ElMessage.success(`已移动到 ${item.name}`);
   }
-  
+
   dragOverFolder.value = null;
 };
 </script>
@@ -548,7 +520,6 @@ const handleDropIntoFolder = (e, item) => {
 <style scoped>
 .file-manager {
   min-height: 100vh;
-  background-color: #f5f5f5;
   padding: 20px;
 }
 
@@ -615,14 +586,14 @@ const handleDropIntoFolder = (e, item) => {
 .file-item:hover {
   background: #f9fafb;
   border-color: #d1d5db;
-} 
+}
 
- .file-item.drag-over-folder {
+.file-item.drag-over-folder {
   border-color: #67c23a;
   background: #f0f9ff;
   transform: scale(1.02);
   box-shadow: 0 4px 12px rgba(103, 194, 58, 0.2);
-} 
+}
 
 /* VueDraggable 类名 */
 .ghost {
@@ -808,5 +779,10 @@ const handleDropIntoFolder = (e, item) => {
 
 .menu-item span {
   font-size: 14px;
+}
+
+.breadcrumb-home {
+  display: flex;
+
 }
 </style>

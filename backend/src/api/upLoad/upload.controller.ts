@@ -15,8 +15,9 @@ import { FileInterceptor, MulterFile } from '@webundsoehne/nest-fastify-file-upl
 
 import { UploadService } from './upload.service';
 import { ApiOperation } from '@nestjs/swagger';
-import { directoryDto } from './dto/directoryDto';
+import { DirectoryDto } from './dto/directoryDto';
 import { fileDto } from './dto/fileDto';
+import { updateDirectoryDto } from './dto/updateDirectoryDto';
 
 @Controller('upload')
 export class UploadController {
@@ -28,8 +29,6 @@ export class UploadController {
    */
   @Post('small')
   @UseInterceptors(FileInterceptor('file'))
-
-
   async uploadSmallFile(
     @UploadedFile('file') file: MulterFile,
     @Body('directoryId') directoryId?: string,
@@ -142,25 +141,22 @@ export class UploadController {
   async cancelChunkUpload(@Param('sessionId') sessionId: string) {
     return await this.uploadService.cancelChunkUpload(sessionId);
   }
-  /**
-   * 小文件直接上传接口
-   * POST /upload/small
-   */
+
   @ApiOperation({ summary: 'addDirectory' })
 
   @Post('addDirectory')
   async addDirectory(
-    @Body() body: directoryDto
+    @Body() body: DirectoryDto
   ) {
-    const { directoryId, DirectoryName } = body;
+    const { directoryId, directoryName } = body;
 
     return await this.uploadService.addDirectory(
 
       directoryId,
-      DirectoryName
+      directoryName
     );
   }
-  
+
   //删除文件夹
   @ApiOperation({ summary: 'deleteDirectory' })
   @Delete('deleteDirectory/:directoryId')
@@ -177,7 +173,7 @@ export class UploadController {
   @ApiOperation({ summary: 'updateFile' })
   @Put('updateFile/:fileId')
   async updateFile(
-        @Param('fileId') fileId: string,
+    @Param('fileId') fileId: string,
 
     @Body() body: fileDto
   ) {
@@ -190,7 +186,7 @@ export class UploadController {
   @Put('updateDirectory/:directoryId')
   async updateDirectory(
     @Param('directoryId') directoryId: string,
-    @Body() body: directoryDto
+    @Body() body: updateDirectoryDto
   ) {
     return await this.uploadService.updateDirectory(
       directoryId,
@@ -200,10 +196,12 @@ export class UploadController {
 
   //获取文件夹下的文件和目录
   @ApiOperation({ summary: 'getDirectoryFiles' })
-  @Get('getDirectoryFiles/:directoryId')
+  @Get('getDirectoryFiles')
   async getDirectoryFiles(
-    @Param('directoryId') directoryId: string
+    @Query('directoryId') directoryId: string | null | undefined
   ) {
+    directoryId = (directoryId && directoryId !== 'undefined' && directoryId !== 'null') ? directoryId : undefined;
+
     return await this.uploadService.getDirectoryFiles(
       directoryId
     );

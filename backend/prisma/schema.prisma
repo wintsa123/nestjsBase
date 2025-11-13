@@ -56,7 +56,7 @@ model File {
   directoryId   String?
   directory     Directory? @relation(fields: [directoryId], references: [id])
 
-  fileName      String                          // 文件名（如 report.pdf）
+  name      String                          // 文件名（如 report.pdf）
   fileType      String?                         // 文件类型（pdf, docx, txt...）
   fileSize      Int
   hash       String                   // 文件内容hash（用于去重）

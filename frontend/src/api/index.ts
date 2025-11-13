@@ -16,11 +16,12 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
 
 
     if (data.code != 0) {
-              ElMessage.error(data.message || data.params.message)
+      ElMessage.error(data.message || data.params.message)
 
       throw data.message
     }
     ElMessage.success(data.message)
+
     localStorage.setItem('token', data.data.token);
     localStorage.setItem('refresh_token', data.data.refresh_token);
     localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
@@ -56,9 +57,10 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
         localStorage.setItem('refresh_token', data.data.refresh_token);
         localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
 
-
+        debugger
 
       } catch (error) {
+        debugger
         // token刷新失败，跳转回登录页
         location.href = '/login';
         // 并抛出错误

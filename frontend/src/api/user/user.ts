@@ -42,8 +42,3 @@ export const logout = () => {
     };
     return method;
 };
-export const test = () => {
-    const method = alovaInstance.Post('/user/test',{});
-  
-    return method;
-};
