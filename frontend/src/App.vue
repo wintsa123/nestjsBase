@@ -2,6 +2,7 @@
   <div class="app-container">
     <router-view />
   </div>
+  <!-- <Upload></Upload> -->
 </template>
 
 <script setup lang="ts">

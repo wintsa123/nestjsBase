@@ -21,13 +21,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     //dev的时候方便
     const request = context.switchToHttp().getRequest();
     const clientIP = request.ip;
-    if (clientIP == '127.0.0.1' || clientIP == '::1') {
-      request.user = {
-        "userId": 2,
-        "key": "phone:17666503623"
-      }
-      return true;
-    }
+    // if (clientIP == '127.0.0.1' || clientIP == '::1') {
+    //   if (!request.user) {
+    //     console.log(request.user)
+    //     request.user = {
+    //       "userId": 1,
+    //       "key": "phone:17666503623",
+    //       "realname": 'test'
+    //     }
+    //   }
+
+    //   return true;
+    // }
     return super.canActivate(context);
 
 

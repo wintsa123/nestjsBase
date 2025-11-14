@@ -52,12 +52,12 @@ const { onAuthRequired, onResponseRefreshToken } = createClientTokenAuthenticati
     // 当token过期时触发，在此函数中触发刷新token
     handler: async method => {
       try {
-        const data = await refreshToken({ refreshToken: localStorage.getItem('refresh_token') });
+        const data = await refreshToken( localStorage.getItem('refresh_token') );
         localStorage.setItem('token', data.data.token);
         localStorage.setItem('refresh_token', data.data.refresh_token);
         localStorage.setItem('tokenExpireTime', data.data.tokenExpireTime);
 
-        debugger
+        
 
       } catch (error) {
         debugger

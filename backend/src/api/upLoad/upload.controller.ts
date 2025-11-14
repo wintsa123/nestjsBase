@@ -4,12 +4,12 @@ import {
   Body,
   UseInterceptors,
   BadRequestException,
-  Query,
   Delete,
-  Param,
+  Query,
   UploadedFile,
   Put,
-  Get
+  Get,
+  Req
 } from '@nestjs/common';
 import { FileInterceptor, MulterFile } from '@webundsoehne/nest-fastify-file-upload';
 
@@ -18,6 +18,7 @@ import { ApiOperation } from '@nestjs/swagger';
 import { DirectoryDto } from './dto/directoryDto';
 import { fileDto } from './dto/fileDto';
 import { updateDirectoryDto } from './dto/updateDirectoryDto';
+import { deleteDirectoryDto } from './dto/deleteDirectoryDto';
 
 @Controller('upload')
 export class UploadController {
@@ -28,15 +29,18 @@ export class UploadController {
    * POST /upload/small
    */
   @Post('small')
+
   @UseInterceptors(FileInterceptor('file'))
   async uploadSmallFile(
+    @Req() req: Request | any,
     @UploadedFile('file') file: MulterFile,
     @Body('directoryId') directoryId?: string,
-    @Body('uploaderId') uploaderId?: string
   ) {
     if (!file) {
       throw new BadRequestException('请上传文件');
     }
+    const uploaderId = req.user || ''
+    console.log(uploaderId)
     // 检查文件大小（小于50MB）
     // const MAX_SIZE = 50 * 1024 * 1024;
     // if (file.size > MAX_SIZE) {
@@ -138,7 +142,7 @@ export class UploadController {
    * DELETE /upload/chunk/:sessionId
    */
   @Delete('chunk/:sessionId')
-  async cancelChunkUpload(@Param('sessionId') sessionId: string) {
+  async cancelChunkUpload(@Query('sessionId') sessionId: string) {
     return await this.uploadService.cancelChunkUpload(sessionId);
   }
 
@@ -159,21 +163,22 @@ export class UploadController {
 
   //删除文件夹
   @ApiOperation({ summary: 'deleteDirectory' })
-  @Delete('deleteDirectory/:directoryId')
-  async deleteDirectory(@Param('directoryId') directoryId: string) {
+  @Delete('deleteDirectory')
+  async deleteDirectory(@Body() data: deleteDirectoryDto) {
+    const { directoryId } = data;
     return await this.uploadService.deleteDirectory(directoryId);
   }
   //删除文件
   @ApiOperation({ summary: 'deleteFile' })
-  @Delete('deleteFile/:fileId')
-  async deleteFile(@Param('fileId') fileId: string) {
+  @Delete('deleteFile')
+  async deleteFile(@Query('fileId') fileId: string) {
     return await this.uploadService.deleteFile(fileId);
   }
   //更新文件
   @ApiOperation({ summary: 'updateFile' })
-  @Put('updateFile/:fileId')
+  @Put('updateFile')
   async updateFile(
-    @Param('fileId') fileId: string,
+    @Query('fileId') fileId: string,
 
     @Body() body: fileDto
   ) {
@@ -183,9 +188,9 @@ export class UploadController {
   }
   //更新文件夹
   @ApiOperation({ summary: 'updateDirectory' })
-  @Put('updateDirectory/:directoryId')
+  @Put('updateDirectory')
   async updateDirectory(
-    @Param('directoryId') directoryId: string,
+    @Query('directoryId') directoryId: string,
     @Body() body: updateDirectoryDto
   ) {
     return await this.uploadService.updateDirectory(

@@ -68,7 +68,7 @@ export class userService {
 
   async login(user: any) {
     const TokenPayload = {
-      sub: user.id, key: user.phone ? `phone:${user.phone}` : `email:${user.email}`
+      sub: user.id, key: user.phone ? `phone:${user.phone}` : `email:${user.email}`,realname:user.realname
     };
     const accessToken = this.jwtService.sign(TokenPayload);
  
@@ -142,7 +142,7 @@ export class userService {
       const createUser = await this.pgService.user.create({ data: users })
       // 生成 access_token
       const TokenPayload = {
-        sub: createUser.id, key: createUser.phone ? `phone:${createUser.phone}` : `email:${createUser.email}`
+        sub: createUser.id, key: createUser.phone ? `phone:${createUser.phone}` : `email:${createUser.email}`,realname:userData.realname
       };
       const accessToken = this.jwtService.sign(TokenPayload);
 
@@ -189,15 +189,14 @@ export class userService {
     let userInfo
     try {
       payload = this.jwtService.verify(refreshToken, { secret: process.env.JWT_refreshSECRET || 'wintsa_refresh' });
-      console.log(payload, 'payload')
        userInfo = await this.pgService.user.findUnique({
         select: {      
           phone: true,
           email: true,
+          realname: true,
         },
         where: { id: payload.sub },  // 根据 sub（用户 ID）查询用户
       });
-            console.log(userInfo, 'userInfo')
 
   
     } catch (error) {
@@ -205,17 +204,19 @@ export class userService {
 
       throw new UnauthorizedException('Invalid refresh token');
     }
-
     const { sub: userId, version } = payload;
 
     // 获取 Redis 中的用户版本号
     const redisKey = `user:${userId}:version`; // Redis key 为 用户 ID + 版本号
     const storedVersion = await this.redisService.get(redisKey);
-    if (storedVersion && storedVersion < version 
+    console.log(version, 'version')
+    console.log(storedVersion, 'storedVersion')
+
+    if (storedVersion && storedVersion > version 
     ) {
       throw new UnauthorizedException('Refresh token version mismatch');
     }
-    const newPayload = { sub: userId, key: !!userInfo.phone  ? `phone:${userInfo.phone}` : `email:${userInfo.email}` };
+    const newPayload = { sub: userId, key: !!userInfo.phone  ? `phone:${userInfo.phone}` : `email:${userInfo.email}`,realname:userInfo.realname };
     const accessToken = await this.jwtService.sign(newPayload);
 
     const newVersion = version + 1;  // 增加版本号
@@ -226,7 +227,6 @@ export class userService {
 
     // 计算 token 的生效时间和过期时间
     const now = Math.floor(Date.now() / 1000); // 当前时间（秒）
-
     const redisExpireTime = now + 7 * 24 * 60 * 60; // 设置为 7 天有效期
     await this.redisService.set(redisKey, newVersion, redisExpireTime); // 更新版本号
     // 返回结果

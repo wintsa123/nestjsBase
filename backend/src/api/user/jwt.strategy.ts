@@ -16,6 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any) {
     const { key, sub } = payload;
+    console.log(1)
     const user = await this.pgService.user.findUnique({
       select: {
         realname: true,
@@ -47,8 +48,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!isValid) {
       throw new Error('Invalid key');
     }
-    const userInfo={ userId: sub, key: key, ...user }
-
+    const userInfo = { userId: sub, key: key, ...user }
     return userInfo;
   }
 }

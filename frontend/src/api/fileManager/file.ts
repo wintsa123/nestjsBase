@@ -11,7 +11,6 @@ export const directoryInfo: any = (directoryId: string | null) => {
 
         {
             transform(data: any) {
-                console.log(data)
                 data.sub = [...data.subDirs.map((e: any) => ({
                     ...e,
                     type: 'directory'
@@ -21,6 +20,7 @@ export const directoryInfo: any = (directoryId: string | null) => {
                 }))]
                 return data;
             },
+        hitSource: ['newDirectory','deleteDirectory']
 
             //     cacheFor: {
             //         // 设置缓存模式为持久化模式,增删改查的时候需要触发钩子清空缓存
@@ -31,6 +31,19 @@ export const directoryInfo: any = (directoryId: string | null) => {
 
         }
     );
+
+    return method;
+};
+
+export const newDirectory: any = (data: {directoryId: string | null, directoryName: string}) => {
+    const method = alovaInstance.Post('/upload/addDirectory', data,{name:'newDirectory'});
+
+    return method;
+};
+export const deleteDirectory: any = (directoryId:string) => {
+    const method = alovaInstance.Delete(`/upload/deleteDirectory`, {
+       directoryId
+    },{name:'deleteDirectory'});
 
     return method;
 };

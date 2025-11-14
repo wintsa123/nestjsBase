@@ -131,7 +131,6 @@ const { data, onSuccess, loading } = useRequest(userInfo, {
 
 
 }).onSuccess(({ data, method }) => {
-  console.log(data, 'userInfo')
   localStorage.setItem('userInfo', JSON.stringify(data));
 
 })

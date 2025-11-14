@@ -5,6 +5,7 @@ import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Public } from '@src/decorators/Public';
 import { register } from './dto/register.dto';
+import { Token } from './dto/tokenDto';
 
 // import { LocalAuthGuard } from './local-auth.guard';
 @ApiTags('user')
@@ -43,7 +44,7 @@ export class AuthController {
 
   @Public() // 跳过控制器级别的验证
   @Post('refresh')
-  async refresh(@Body() data: { refreshToken: string }) {
+  async refresh(@Body() data: Token) {
     // const cookies = request.cookies; // 获取所有 Cookie
     if (!data.refreshToken) {
       throw new UnauthorizedException('Refresh token is required');
@@ -51,14 +52,7 @@ export class AuthController {
     // const refreshTokenFromCookie = cookies['refreshToken']; // 获取指定的 Cookie（假设你用的是 `refreshToken` 作为 Cookie 的键名）
     return this.authService.refresh(data.refreshToken);
   }
-  @Post('test')
-  @ApiBearerAuth('JWT-auth') // 与 main.ts 中定义的安全方案名称一致
-  async test(
-    @Req() req: Request | any
-  ) {
-    const user = req.user;
-    return user;
-  }
+
   @Post('logout')
   @ApiBearerAuth('JWT-auth') // 与 main.ts 中定义的安全方案名称一致
   async logout(
@@ -75,6 +69,7 @@ export class AuthController {
     if (!req.user) {
       throw '请先登录'
     }
+
     const { userId, key, ...userWithoutPassword } = req.user;
     return { ...userWithoutPassword };
   }

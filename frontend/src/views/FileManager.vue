@@ -1,5 +1,6 @@
 <template>
-  <div class="file-manager" @click="closeContextMenu" @contextmenu.prevent="handleEmptyContextMenu">
+   <Upload ref="uploadRef" @confirm="handleUploadConfirm"></Upload>
+  <div class="file-manager" @click="closeContextMenu">
     <div class="header">
       <div class="header-top">
         <h1>文件管理器</h1>
@@ -37,8 +38,8 @@
     </div>
 
     <!-- 列表模式 -->
-    <div v-if="directoryFiles && directoryFiles.sub.length > 0">
-      <div v-if="viewMode === 'list'" class="list-view" @contextmenu.prevent="handleEmptyContextMenu">
+    <div v-if="directoryFiles && directoryFiles.sub.length > 0" @contextmenu.prevent="handleEmptyContextMenu">
+      <div v-if="viewMode === 'list'" class="list-view">
         <VueDraggable v-model="directoryFiles.sub" ghostClass="ghost" :animation="150" @start="onDragStart"
           @end="onDragEnd" @update="onDragChange">
           <div v-for="item in directoryFiles.sub" :key="item.id" @contextmenu.prevent="handleContextMenu($event, item)"
@@ -67,7 +68,7 @@
       </div>
 
       <!-- 平铺模式 -->
-      <div v-else class="grid-view" @contextmenu.prevent="handleEmptyContextMenu">
+      <div v-else class="grid-view">
         <VueDraggable v-model="directoryFiles.sub" ghostClass="ghost" class="grid-container" :animation="300"
           @start="onDragStart" @end="onDragEnd" @update="onDragChange">
           <div v-for="item in directoryFiles.sub" :key="item.id" @contextmenu.prevent="handleContextMenu($event, item)"
@@ -93,91 +94,55 @@
       </div>
     </div>
 
+    <el-dropdown ref="dropdownRef" :virtual-ref="triggerRef" :show-arrow="false" :popper-options="{
+      modifiers: [{ name: 'offset', options: { offset: [0, 0] } }],
+    }" virtual-triggering trigger="contextmenu" placement="bottom-start">
+      <template #dropdown v-if="!contextMenu.item">
+        <el-dropdown-menu>
+          <el-dropdown-item :icon="DocumentCopy" :disabled="!clipboard" @click="handlePaste">粘贴</el-dropdown-item>
+          <el-dropdown-item :icon="FolderAdd" @click="handleCreateFolder"> 新建文件夹 </el-dropdown-item>
+          <el-dropdown-item :icon="FolderAdd" @click="uploadRef.open()">上传文档</el-dropdown-item>
 
-    <!-- 右键菜单 -->
-    <div v-if="contextMenu.show" class="context-menu" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
-      @click.stop>
-      <!-- 空白区域右键菜单 -->
-      <template v-if="!contextMenu.item">
-        <div class="menu-item" :class="{ disabled: !clipboard }" @click="handlePaste">
-          <el-icon>
-            <DocumentCopy />
-          </el-icon>
-          <span>粘贴</span>
-        </div>
-        <div class="menu-item" @click="handleCreateFolder">
-          <el-icon>
-            <FolderAdd />
-          </el-icon>
-          <span>新建文件夹</span>
-        </div>
-        <div class="menu-item" @click="handleCreateFolder">
-          <el-icon>
-            <FolderAdd />
-          </el-icon>
-          <span>上传文件</span>
-        </div>
-      </template>
+        </el-dropdown-menu>
 
-      <!-- 文件/文件夹右键菜单 -->
-      <template v-else>
-        <div class="menu-item" @click="handleOpen(contextMenu.item)">
-          <el-icon>
-            <View />
-          </el-icon>
-          <span>打开</span>
-        </div>
-        <div class="menu-item" @click="handleRename(contextMenu.item)">
-          <el-icon>
-            <Edit />
-          </el-icon>
-          <span>重命名</span>
-        </div>
-        <div class="menu-item" @click="handleSetSortOrder(contextMenu.item)">
-          <el-icon>
-            <Sort />
-          </el-icon>
-          <span>设置排序号</span>
-        </div>
-        <el-divider style="margin: 4px 0" />
-        <div class="menu-item" @click="handleCopy(contextMenu.item)">
-          <el-icon>
-            <CopyDocument />
-          </el-icon>
-          <span>复制</span>
-        </div>
-        <div class="menu-item" @click="handleCut(contextMenu.item)">
-          <el-icon>
-            <Scissor />
-          </el-icon> <span>剪切</span>
-        </div>
-        <div class="menu-item" :class="{ disabled: !clipboard }" @click="handlePaste">
-          <el-icon>
-            <DocumentCopy />
-          </el-icon>
-          <span>粘贴</span>
-        </div>
-        <div class="menu-item" @click="handleCreateFolder">
-          <el-icon>
-            <FolderAdd />
-          </el-icon>
-          <span>新建文件夹</span>
-        </div>
-        <el-divider style="margin: 4px 0" />
-        <div class="menu-item danger" @click="handleDelete(contextMenu.item)">
-          <el-icon>
-            <Delete />
-          </el-icon>
-          <span>删除</span>
-        </div>
       </template>
-    </div>
+      <template #dropdown v-else>
+        <el-dropdown-menu>
+          <el-dropdown-item :icon="View" @click="handleOpen(contextMenu.item)">打开</el-dropdown-item>
+          <el-dropdown-item :icon="Edit" @click="handleRename(contextMenu.item)"> 重命名 </el-dropdown-item>
+          <el-dropdown-item :icon="Sort" @click="handleSetSortOrder(contextMenu.item)">设置排序号</el-dropdown-item>
+          <el-dropdown-item :icon="CopyDocument" @click="handleCopy(contextMenu.item)">复制</el-dropdown-item>
+          <el-dropdown-item :icon="Scissor" @click="handleCut(contextMenu.item)">剪切</el-dropdown-item>
+          <el-dropdown-item :icon="DocumentCopy" :disabled="!clipboard" @click="handlePaste">粘贴</el-dropdown-item>
+          <el-dropdown-item :icon="FolderAdd" @click="handleCreateFolder"> 新建文件夹 </el-dropdown-item>
+          <el-dropdown-item :icon="Delete" @click="handleDelete(contextMenu.item)">删除</el-dropdown-item>
+        </el-dropdown-menu>
+
+      </template>
+    </el-dropdown>
+
   </div>
 </template>
 
 <script setup>
 import { ref, computed, nextTick, watch } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
+const dropdownRef = ref()
+const dialogFormVisible = ref(false)
+const uploadRef = ref()
+const handleUploadConfirm = (data) => {
+ getDirectoryFiles(currentPath[currentPath.length-1].id)
+}
+const position = ref({
+  top: 0,
+  left: 0,
+  bottom: 0,
+  right: 0,
+})
+
+const triggerRef = ref({
+  getBoundingClientRect: () => position.value,
+})
 import {
   Folder,
   Scissor,
@@ -193,14 +158,21 @@ import {
   HomeFilled,
   Rank
 } from '@element-plus/icons-vue';
+
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { directoryInfo } from "@/api/fileManager/file";
+import { directoryInfo, newDirectory, deleteDirectory } from "@/api/fileManager/file";
+import Upload from '@/components/Upload/Upload.vue';
 // 当前路径 - 用于面包屑导航
 const currentPath = ref([]);
-const { send: getDirectoryFiles, data: directoryFiles, onSuccess } = useRequest(directoryInfo);
+const { send: getDirectoryFiles, data: directoryFiles, onSuccess: getDirectoryFilesSuccess } = useRequest(directoryInfo);
+const { send: senddeleteDirectory, onSuccess: deleteDirectorySuccess } = useRequest(deleteDirectory, { immediate: false });
 
+deleteDirectorySuccess((data) => {
+  directoryFiles.value.sub = directoryFiles.value.sub.filter((item) => item.id !== data.args[0])
 
-onSuccess((data) => {
+  ElMessage.success(`删除成功,一共删除${data.data.deletedDirectories}个文件夹，${data.data.deletedFiles}个文件`);
+})
+getDirectoryFilesSuccess((data) => {
   const newItem = { id: data.data.id, name: data.data.name }
 
   const existingIndex = currentPath.value.findIndex(
@@ -219,32 +191,7 @@ const viewMode = ref('list');
 
 
 
-// 所有文件数据（模拟根目录和子目录）
-const allFiles = ref({
-  '/': [
-    { id: 1, name: '文档', type: 'folder', sortOrder: 1, children: [] },
-    { id: 2, name: '图片', type: 'folder', sortOrder: 2, children: [] },
-    { id: 3, name: 'README.md', type: 'file', sortOrder: 3 },
-    { id: 4, name: '配置文件.json', type: 'file', sortOrder: 4 },
-    { id: 5, name: '视频', type: 'folder', sortOrder: 5, children: [] },
-    { id: 6, name: '音乐', type: 'folder', sortOrder: 6, children: [] },
-    { id: 7, name: 'package.json', type: 'file', sortOrder: 7 },
-    { id: 8, name: 'index.html', type: 'file', sortOrder: 8 },
-  ],
-  '/文档': [
-    { id: 11, name: '工作文档.docx', type: 'file', sortOrder: 1 },
-    { id: 12, name: '个人笔记.txt', type: 'file', sortOrder: 2 },
-  ],
-  '/图片': [
-    { id: 21, name: '照片', type: 'folder', sortOrder: 1, children: [] },
-    { id: 22, name: 'avatar.png', type: 'file', sortOrder: 2 },
-  ],
-});
 
-// 当前显示的文件列表
-const files = ref([...allFiles.value['/']]);
-
-const contextMenu = ref({ show: false, x: 0, y: 0, item: null });
 const editingId = ref(null);
 const editingName = ref('');
 const clipboard = ref(null);
@@ -253,12 +200,7 @@ const draggedItem = ref(null);  // 当前拖拽的项
 const dragOverFolder = ref(null);  // 鼠标悬停的文件夹
 const dragEnterTimer = ref(null);  // 延迟进入文件夹的定时器
 
-// 监听文件列表变化，更新排序号
-watch(files, (newFiles) => {
-  newFiles.forEach((file, index) => {
-    file.sortOrder = index + 1;
-  });
-}, { deep: true });
+
 
 // 获取当前路径字符串
 const getCurrentPathString = () => {
@@ -274,32 +216,40 @@ const navigateToPath = (index) => {
 };
 
 const closeContextMenu = () => {
-  contextMenu.value = { show: false, x: 0, y: 0, item: null };
+  dropdownRef.value?.handleClose()
 };
 
-// 空白区域右键菜单
+
+const contextMenu = ref({
+  item: null,
+})
 const handleEmptyContextMenu = (e) => {
   // 检查是否点击在文件项上
   const target = e.target;
   const isFileItem = target.closest('.file-item') || target.closest('.grid-item');
 
   if (!isFileItem) {
-    contextMenu.value = {
-      show: true,
-      x: e.clientX,
-      y: e.clientY,
-      item: null  // null 表示空白区域
-    };
-  }
-};
+    const { clientX, clientY } = e
+    position.value = DOMRect.fromRect({
+      x: clientX,
+      y: clientY,
+    })
+    contextMenu.value = { item: false }
+
+    dropdownRef.value?.handleOpen()
+
+  };
+}
 
 const handleContextMenu = (e, item) => {
-  contextMenu.value = {
-    show: true,
-    x: e.clientX,
-    y: e.clientY,
-    item: item
-  };
+  const { clientX, clientY } = event
+  position.value = DOMRect.fromRect({
+    x: clientX,
+    y: clientY,
+  })
+  event.preventDefault()
+  contextMenu.value = { item }
+  dropdownRef.value?.handleOpen()
 };
 
 const handleRename = (item) => {
@@ -322,10 +272,7 @@ const confirmRename = () => {
   if (editingName.value.trim()) {
     // TODO: 调用重命名API
     console.log('重命名:', editingId.value, editingName.value);
-    const item = files.value.find(f => f.id === editingId.value);
-    if (item) {
-      item.name = editingName.value;
-    }
+   
     ElMessage.success('重命名成功');
   }
   editingId.value = null;
@@ -333,6 +280,8 @@ const confirmRename = () => {
 
 const handleDelete = async (item) => {
   try {
+    closeContextMenu();
+
     await ElMessageBox.confirm(
       `确定要删除 "${item.name}" 吗?`,
       '确认删除',
@@ -343,15 +292,38 @@ const handleDelete = async (item) => {
       }
     );
     // TODO: 调用删除API
-    console.log('删除:', item, '路径:', getCurrentPathString());
-    files.value = files.value.filter(f => f.id !== item.id);
-    ElMessage.success('删除成功');
+    await senddeleteDirectory(item.id)
+
   } catch {
     // 用户取消
   }
-  closeContextMenu();
 };
+const { data: createFolder, send: sendCreateFolder, onSuccess: createFolderSuccess } = useRequest(newDirectory, {
+  immediate: false
+})
+createFolderSuccess((data) => {
+  const { data: data1 } = data
+  directoryFiles.value.sub.unshift({ id: data1.id, name: data1.name, type: 'directory' });
+})
 
+const handleCreateFolder = async () => {
+  try {
+    const { value } = await ElMessageBox.prompt('来取个什么名字吧？', '新建文件夹', {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+
+    })
+
+    const data = await sendCreateFolder({
+      directoryId: currentPath.value[currentPath.value.length - 1].id,
+      directoryName: value
+    })
+
+
+  } catch (error) {
+    console.log(error)
+  }
+};
 const handleOpen = (item) => {
   if (item.type === 'directory') {
     // 进入文件夹
@@ -368,20 +340,7 @@ const handleOpen = (item) => {
   closeContextMenu();
 };
 
-const handleCreateFolder = () => {
-  const newFolder = {
-    id: Date.now(),
-    name: '新建文件夹',
-    type: 'folder',
-    sortOrder: files.value.length + 1,
-    children: []
-  };
-  // TODO: 调用创建文件夹API
-  console.log('创建文件夹:', newFolder, '路径:', getCurrentPathString());
-  files.value.push(newFolder);
-  ElMessage.success('创建文件夹成功');
-  closeContextMenu();
-};
+
 
 const handleCopy = (item) => {
   clipboard.value = { item, action: 'copy' };
@@ -421,18 +380,18 @@ const handleSetSortOrder = async (item) => {
 
     if (value) {
       const newOrder = parseInt(value);
-      const currentIndex = files.value.findIndex(f => f.id === item.id);
+    
 
-      if (currentIndex !== -1) {
-        // 移除当前项
-        const [movedItem] = files.value.splice(currentIndex, 1);
-        // 插入到新位置
-        files.value.splice(newOrder - 1, 0, movedItem);
+      // if (currentIndex !== -1) {
+      //   // 移除当前项
+      //   const [movedItem] = files.value.splice(currentIndex, 1);
+      //   // 插入到新位置
+      //   files.value.splice(newOrder - 1, 0, movedItem);
 
-        // TODO: 调用设置排序API
-        console.log('设置排序:', item.id, value, '路径:', getCurrentPathString());
-        ElMessage.success('排序设置成功');
-      }
+      //   // TODO: 调用设置排序API
+      //   console.log('设置排序:', item.id, value, '路径:', getCurrentPathString());
+      //   ElMessage.success('排序设置成功');
+      // }
     }
   } catch {
     // 用户取消
@@ -442,7 +401,7 @@ const handleSetSortOrder = async (item) => {
 
 // VueDraggable 事件处理
 const onDragStart = (evt) => {
-  draggedItem.value = files.value[evt.oldIndex];
+  draggedItem.value = directoryFiles.value.sub[evt.oldIndex];
   console.log('开始拖拽:', draggedItem.value);
 };
 
@@ -460,7 +419,6 @@ const onDragEnd = (evt) => {
 
 const onDragChange = (evt) => {
   // TODO: 调用保存排序API
-  console.log('排序变化:', files.value.map(f => ({ id: f.id, sortOrder: f.sortOrder })));
   ElMessage.success('排序已更新');
 };
 
@@ -508,7 +466,6 @@ const handleDropIntoFolder = (e, item) => {
     console.log('移动文件到文件夹:', draggedItem.value, '→', item);
 
     // 从当前列表移除
-    files.value = files.value.filter(f => f.id !== draggedItem.value.id);
 
     ElMessage.success(`已移动到 ${item.name}`);
   }
@@ -569,6 +526,7 @@ const handleDropIntoFolder = (e, item) => {
   background: white;
   border-radius: 8px;
   padding: 16px;
+  min-height: 65vh;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
